@@ -232,8 +232,22 @@ Example:
 
 ---
 
+### Vehicle Photos
+Manages multiple photos for each vehicle listing.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/listings/{id}/photos` | Upload a new vehicle photo | ✅ (Owner) |
+| `GET` | `/listings/{id}/photos` | Retrieve all photos for a listing | ❌ |
+| `DELETE` | `/listings/{id}/photos/{photo_id}` | Delete a photo from a listing | ✅ (Owner/Admin) |
+
+---
+
 ## 2. Request/Response Format
 
+---
+
+## **User Authentication & Management**
 ### **POST /auth/register**
 #### Request
 ```json
@@ -251,6 +265,108 @@ Example:
   "email": "user@example.com",
   "name": "John Doe",
   "phone_number": "+123456789",
+  "created_at": "2025-02-01T12:00:00Z"
+}
+```
+
+---
+
+### **POST /auth/login**
+#### Request
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+#### Response
+```json
+{
+  "token": "jwt_token_here",
+  "user": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "phone_number": "+123456789",
+    "role": "user",
+    "created_at": "2025-02-01T12:00:00Z"
+  }
+}
+```
+
+---
+
+### **GET /users/{id}**
+#### Response
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "email": "user@example.com",
+  "name": "John Doe",
+  "phone_number": "+123456789",
+  "role": "user",
+  "created_at": "2025-02-01T12:00:00Z"
+}
+```
+
+---
+
+### **PUT /users/{id}**
+#### Request
+```json
+{
+  "name": "John Updated",
+  "phone_number": "+987654321",
+  "password": "newsecurepassword"
+}
+```
+#### Response
+```json
+{
+  "message": "User updated successfully"
+}
+```
+
+---
+
+### **PATCH /users/{id}**
+#### Response
+```json
+{
+  "message": "User account soft deleted"
+}
+```
+
+---
+
+## **Vehicle Listings**
+### **POST /listings**
+#### Request
+```json
+{
+  "title": "Toyota Corolla 2020",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "price": 15000,
+  "mileage": 30000,
+  "year": 2020,
+  "fuel_type": "Petrol",
+  "transmission": "Automatic",
+  "engine_power": 150,
+  "drivetrain": "FWD",
+  "color": "Black",
+  "description": "Well-maintained, no accidents",
+  "location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  },
+  "is_second_hand": true
+}
+```
+#### Response
+```json
+{
+  "listing_id": "abc123",
   "created_at": "2025-02-01T12:00:00Z"
 }
 ```
@@ -280,6 +396,159 @@ Example:
 
 ---
 
+### **GET /listings/{id}**
+#### Response
+```json
+{
+  "listing_id": "abc123",
+  "title": "Toyota Corolla 2020",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "price": 15000,
+  "mileage": 30000,
+  "year": 2020,
+  "fuel_type": "Petrol",
+  "transmission": "Automatic",
+  "engine_power": 150,
+  "drivetrain": "FWD",
+  "color": "Black",
+  "description": "Well-maintained, no accidents",
+  "location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  },
+  "is_second_hand": true
+}
+```
+
+---
+
+### **PUT /listings/{id}**
+#### Request
+```json
+{
+  "title": "Toyota Corolla 2021",
+  "price": 16000,
+  "mileage": 25000,
+  "color": "Blue",
+  "description": "Recently serviced, excellent condition"
+}
+```
+#### Response
+```json
+{
+  "message": "Listing updated successfully"
+}
+```
+
+---
+
+### **PATCH /listings/{id}**
+#### Response
+```json
+{
+  "message": "Listing soft deleted"
+}
+```
+
+---
+
+## **Vehicle Photos**
+### **POST /listings/{id}/photos**
+#### Request
+```json
+{
+  "photo_url": "https://s3.amazonaws.com/uploads/car_photo.jpg"
+}
+```
+#### Response
+```json
+{
+  "photo_id": "photo123",
+  "listing_id": "abc123",
+  "photo_url": "https://s3.amazonaws.com/uploads/car_photo.jpg",
+  "created_at": "2025-02-01T14:30:00Z"
+}
+```
+
+---
+
+### **GET /listings/{id}/photos**
+#### Response
+```json
+[
+  {
+    "photo_id": "photo123",
+    "photo_url": "https://s3.amazonaws.com/uploads/car_photo.jpg"
+  },
+  {
+    "photo_id": "photo124",
+    "photo_url": "https://s3.amazonaws.com/uploads/car_photo_2.jpg"
+  }
+]
+```
+
+---
+
+### **DELETE /listings/{id}/photos/{photo_id}**
+#### Response
+```json
+{
+  "message": "Photo deleted successfully"
+}
+```
+
+---
+
+## **Favorites**
+### **POST /favorites**
+#### Request
+```json
+{
+  "listing_id": "abc123"
+}
+```
+#### Response
+```json
+{
+  "message": "Listing added to favorites"
+}
+```
+
+---
+
+### **GET /favorites**
+#### Response
+```json
+[
+  {
+    "listing_id": "abc123",
+    "title": "Toyota Corolla 2020",
+    "price": 15000,
+    "mileage": 30000
+  },
+  {
+    "listing_id": "def456",
+    "title": "Honda Civic 2019",
+    "price": 14000,
+    "mileage": 32000
+  }
+]
+```
+
+---
+
+### **DELETE /favorites/{id}**
+#### Response
+```json
+{
+  "message": "Listing removed from favorites"
+}
+```
+
+---
+
+## **Messaging**
 ### **POST /messages**
 #### Request
 ```json
@@ -294,13 +563,45 @@ Example:
 ```json
 {
   "message_id": "msg789",
-  "sender_id": "user123",
-  "receiver_id": "user456",
-  "listing_id": "abc123",
-  "content": "Hello, is this car still available?",
   "created_at": "2025-02-01T14:30:00Z"
 }
 ```
+
+---
+
+## **Reports**
+### **POST /reports**
+#### Request
+```json
+{
+  "listing_id": "abc123",
+  "reason": "This listing is fraudulent"
+}
+```
+#### Response
+```json
+{
+  "report_id": "rep789",
+  "message": "Report submitted successfully"
+}
+```
+
+---
+
+### **GET /reports**
+#### Response
+```json
+[
+  {
+    "report_id": "rep789",
+    "listing_id": "abc123",
+    "reason": "This listing is fraudulent",
+    "status": "open",
+    "created_at": "2025-02-01T15:00:00Z"
+  }
+]
+```
+
 
 ---
 
