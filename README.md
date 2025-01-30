@@ -35,8 +35,6 @@ As a buyer, I want to communicate securely with sellers through in-app messaging
 As an admin, I want to oversee user accounts and listings so that the platform maintains quality and security.
 As a buyer, I want to save my favorite listings so that I can easily revisit and compare them later.
 
-# Database Schema and ER Diagram for Vehicle Marketplace
-
 ## 1. Database Tables and Relationships
 
 ### User Table
@@ -171,43 +169,149 @@ Instead of permanently deleting records, we mark them as inactive.
 
 ---
 
-## 3. CRUD Operations
+## 3. API Endpoints and CRUD
 
 ### Users
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/auth/register` | Register a new user |
-| `GET` | `/users/{id}` | Retrieve user details |
-| `PUT` | `/users/{id}` | Update profile details |
-| `PATCH` | `/users/{id}` | Soft delete account (sets is_deleted=True) |
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/auth/register` | Register a new user | ❌ |
+| `POST` | `/auth/login` | Log in and get access token | ❌ |
+| `GET` | `/users/{id}` | Get user details | ✅ (Self/Admin) |
+| `PUT` | `/users/{id}` | Update user profile (name, phone, password) | ✅ (Self) |
+| `PATCH` | `/users/{id}` | Soft delete user account | ✅ (Self/Admin) |
 
 ---
 
-### Vehicles
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/listings` | Add a new vehicle listing |
-| `GET` | `/listings` | Retrieve vehicle listings |
-| `PUT` | `/listings/{id}` | Edit vehicle details |
-| `PATCH` | `/listings/{id}` | Soft delete a vehicle (sets is_deleted=True) |
+### Listings (Vehicles)
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/listings` | Create a new vehicle listing | ✅ (Seller) |
+| `GET` | `/listings` | Get all vehicle listings (supports search filters) | ❌ |
+| `GET` | `/listings/{id}` | Get vehicle details | ❌ |
+| `PUT` | `/listings/{id}` | Update vehicle listing | ✅ (Owner) |
+| `PATCH` | `/listings/{id}` | Soft delete listing | ✅ (Owner/Admin) |
+
+#### **Search Filters for Listings**
+- **Basic Filters Supported:**
+  - `price_min` and `price_max`
+  - `mileage_min` and `mileage_max`
+  - `year_min` and `year_max`
+  - `fuel_type`
+  - `transmission`
+  
+Example:  
+`GET /listings?price_min=5000&price_max=20000&mileage_max=50000&fuel_type=petrol`
 
 ---
 
 ### Favorites
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/favorites` | Save a vehicle listing |
-| `GET` | `/favorites` | Retrieve saved listings |
-| `DELETE` | `/favorites/{id}` | Remove a saved listing |
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/favorites` | Save a vehicle to favorites | ✅ (User) |
+| `GET` | `/favorites` | Get all favorite listings | ✅ (User) |
+| `DELETE` | `/favorites/{id}` | Remove a saved listing | ✅ (User) |
+| `GET` | `/favorites/count/{listing_id}` | Get the number of users who favorited a listing | ❌ |
 
 ---
 
-### Reports
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/reports` | Report a listing |
-| `GET` | `/reports` | View reports |
-| `PUT` | `/reports/{id}` | Change report status |
-| `DELETE` | `/reports/{id}` | Admin-only option |
+### Messaging (Future Real-Time Support)
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/messages` | Send a message | ✅ (User) |
+| `GET` | `/messages/{user_id}` | Get messages for a user | ✅ (Self) |
+| `PATCH` | `/messages/{id}` | Soft delete a message (only for sender or receiver) | ✅ (Sender/Receiver) |
+
+---
+
+### Reports (Fraud/Disputes)
+| Method | Endpoint | Description | Auth Required |
+|--------|---------|-------------|--------------|
+| `POST` | `/reports` | Report a listing for fraud or violations | ✅ (User) |
+| `GET` | `/reports` | View all reports (admin only) | ✅ (Admin) |
+| `PUT` | `/reports/{id}` | Update report status (`open`, `under review`, `resolved`) | ✅ (Admin) |
+
+---
+
+## 2. Request/Response Format
+
+### **POST /auth/register**
+#### Request
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "John Doe",
+  "phone_number": "+123456789"
+}
+```
+#### Response
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "email": "user@example.com",
+  "name": "John Doe",
+  "phone_number": "+123456789",
+  "created_at": "2025-02-01T12:00:00Z"
+}
+```
+
+---
+
+### **GET /listings**
+#### Response
+```json
+[
+  {
+    "listing_id": "abc123",
+    "title": "Toyota Corolla 2020",
+    "brand": "Toyota",
+    "model": "Corolla",
+    "price": 15000,
+    "mileage": 30000,
+    "year": 2020,
+    "fuel_type": "Petrol",
+    "transmission": "Automatic",
+    "engine_power": 150,
+    "color": "Black",
+    "favorites_count": 12
+  }
+]
+```
+
+---
+
+### **POST /messages**
+#### Request
+```json
+{
+  "sender_id": "user123",
+  "receiver_id": "user456",
+  "listing_id": "abc123",
+  "content": "Hello, is this car still available?"
+}
+```
+#### Response
+```json
+{
+  "message_id": "msg789",
+  "sender_id": "user123",
+  "receiver_id": "user456",
+  "listing_id": "abc123",
+  "content": "Hello, is this car still available?",
+  "created_at": "2025-02-01T14:30:00Z"
+}
+```
+
+---
+
+## 3. Authorization Needs
+
+The API uses **JWT-based authentication** for secure access:
+
+- **User authentication** via `Authorization: Bearer <token>`.
+- **Role-based access control**:
+  - **Users**: Can manage their own data and listings.
+  - **Sellers**: Can create and edit their vehicle listings.
+  - **Admins**: Can review reports and ban users if necessary.
 
 ---
