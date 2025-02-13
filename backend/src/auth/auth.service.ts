@@ -2,16 +2,25 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async register(data: { email: string; password: string; name: string; phoneNumber: string }) {
+  async register(data: { email: string; password: string; name: string; phoneNumber: string; role?: string }) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
+  
     const user = await this.prisma.user.create({
-      data: { ...data, password: hashedPassword },
+      data: {
+        email: data.email,
+        password: hashedPassword,
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        role: data.role?.toUpperCase() === 'ADMIN' ? Role.ADMIN : Role.USER, // Convert role to enum
+      },
     });
+  
     return { message: 'User registered successfully', user };
   }
 
@@ -21,7 +30,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { userId: user.id, email: user.email };
+    const payload = { 
+      id: user.id, 
+      email: user.email,
+      role: user.role, 
+    };
 
     console.log('JWT Secret:', process.env.JWT_SECRET || 'your_secret_key');
     const token = this.jwtService.sign(payload, { secret: 'your_secret_key' });

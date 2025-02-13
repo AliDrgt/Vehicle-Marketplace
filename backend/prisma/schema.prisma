@@ -33,6 +33,7 @@ model User {
   sentMessages     Message[]  @relation("SentMessages")
   receivedMessages Message[]  @relation("ReceivedMessages")
   reports          Report[]   @relation("UserReports")
+  isDeleted        Boolean    @default(false)
 }
 
 model Vehicle {
@@ -58,6 +59,7 @@ model Vehicle {
   reports      Report[]       @relation("VehicleReports")
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  isDeleted    Boolean        @default(false)
 }
 
 model VehiclePhoto {
@@ -93,10 +95,10 @@ model Message {
 model Report {
   id         String       @id @default(uuid())
   reporterId String
-  listingId  String
+  vehicleId  String
   reason     String
   status     ReportStatus @default(OPEN)
   createdAt  DateTime     @default(now())
   reporter   User         @relation("UserReports", fields: [reporterId], references: [id])
-  listing    Vehicle      @relation("VehicleReports", fields: [listingId], references: [id])
+  vehicle    Vehicle      @relation("VehicleReports", fields: [vehicleId], references: [id])
 }

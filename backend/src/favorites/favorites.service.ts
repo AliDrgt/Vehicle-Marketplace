@@ -43,7 +43,7 @@ export class FavoritesService {
     return this.prisma.favorite.findMany({
       where: { userId },
       include: {
-        vehicle: true, // Include vehicle details
+        vehicle: false, // Include vehicle details
       },
     });
   }
