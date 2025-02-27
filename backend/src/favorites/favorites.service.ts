@@ -7,10 +7,10 @@ export class FavoritesService {
   constructor(private prisma: PrismaService) {}
 
   // Add to Favorites
-  async addFavorite(userId: string, vehicleId: string): Promise<Favorite> {
+  async addFavorite(userId: string, listingId: string): Promise<Favorite> {
     // Check if the vehicle exists
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
+    const vehicle = await this.prisma.listing.findUnique({
+      where: { id: listingId },
     });
     if (!vehicle) {
       throw new NotFoundException('Vehicle not found');
@@ -19,9 +19,9 @@ export class FavoritesService {
     // Check if it's already favorited
     const existingFavorite = await this.prisma.favorite.findUnique({
       where: {
-        userId_vehicleId: {
+        userId_listingId: {
           userId,
-          vehicleId,
+          listingId,
         },
       },
     });
@@ -33,7 +33,7 @@ export class FavoritesService {
     return this.prisma.favorite.create({
       data: {
         userId,
-        vehicleId,
+        listingId,
       },
     });
   }
@@ -43,7 +43,7 @@ export class FavoritesService {
     return this.prisma.favorite.findMany({
       where: { userId },
       include: {
-        vehicle: true, // Include vehicle details
+        listing: true, // Include vehicle details
       },
     });
   }
@@ -68,9 +68,9 @@ export class FavoritesService {
   }
 
   // Count Favorites for a Vehicle
-  async countFavoritesForVehicle(vehicleId: string): Promise<number> {
+  async countFavoritesForVehicle(listingId: string): Promise<number> {
     return this.prisma.favorite.count({
-      where: { vehicleId },
+      where: { listingId },
     });
   }
 }

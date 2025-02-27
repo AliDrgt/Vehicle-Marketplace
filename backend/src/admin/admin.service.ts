@@ -39,7 +39,7 @@ export class AdminService {
   // Get all reports
   async getAllReports() {
     return this.prisma.report.findMany({
-      include: { vehicle: true, reporter: { select: { email: true } } },
+      include: { listing: true, reporter: { select: { email: true } } },
     });
   }
 

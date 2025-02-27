@@ -9,9 +9,9 @@ export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
   @Post()
-  async addFavorite(@Request() req: AuthRequest, @Body('vehicle_id') vehicleId: string) {
+  async addFavorite(@Request() req: AuthRequest, @Body('listing_id') listingId: string) {
     const userId = req.user.id;
-    return this.favoritesService.addFavorite(userId, vehicleId);
+    return this.favoritesService.addFavorite(userId, listingId);
   }
 
   @Get()
@@ -24,9 +24,9 @@ export class FavoritesController {
     return this.favoritesService.removeFavorite(req.user.id, favoriteId);
   }
 
-  @Get('count/:vehicle_id')
-  async countFavorites(@Param('vehicle_id') vehicleId: string) {
-    return { vehicleId, count: await this.favoritesService.countFavoritesForVehicle(vehicleId) };
+  @Get('count/:listing_id')
+  async countFavorites(@Param('listing_id') listingId: string) {
+    return { listingId, count: await this.favoritesService.countFavoritesForVehicle(listingId) };
   }
 }
 

@@ -12,8 +12,8 @@ export class ReportsController {
 
 
   @Post()
-  async createReport(@Request() req: AuthRequest, @Body() body: { vehicleId: string; reason: string }) {
-    return this.reportsService.createReport(req.user.id, body.vehicleId, body.reason);
+  async createReport(@Request() req: AuthRequest, @Body() body: { listingId: string; reason: string }) {
+    return this.reportsService.createReport(req.user.id, body.listingId, body.reason);
   }
 
   @Get()

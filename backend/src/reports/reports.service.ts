@@ -7,11 +7,11 @@ export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
   // Create a new report
-  async createReport(reporterId: string, vehicleId: string, reason: string) {
+  async createReport(reporterId: string, listingId: string, reason: string) {
     return this.prisma.report.create({
       data: {
         reporterId,
-        vehicleId, 
+        listingId, 
         reason,
         status: ReportStatus.OPEN, // Default status set
       },
@@ -22,16 +22,16 @@ export class ReportsService {
   async getAllReports() {
     return this.prisma.report.findMany({
       include: { 
-        vehicle: true, 
+        listing: true, 
         reporter: { select: { email: true } } 
       },
     });
   }
 
   // Get reports for a specific vehicle
-  async getReportsForVehicle(vehicleId: string) {
+  async getReportsForVehicle(listingId: string) {
     return this.prisma.report.findMany({
-      where: { vehicleId }, 
+      where: { listingId }, 
     });
   }
 

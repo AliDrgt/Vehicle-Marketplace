@@ -34,23 +34,23 @@ class LocationDto {
 
 export class UpdateVehicleDto extends PartialType(CreateVehicleDto) {}
 @UseGuards(JwtAuthGuard)
-@Controller('vehicles')
-export class VehicleController {
+@Controller('listing')
+export class ListingController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   // Create Vehicle
   @Post()
-  async createVehicle(@Request() req: AuthRequest, @Body() body: CreateVehicleDto) {
+  async createListing(@Request() req: AuthRequest, @Body() body: CreateVehicleDto) {
     const userId = req.user.id;
     if (!userId) {
       throw new Error('User ID is missing from request');
     }
-    return this.vehicleService.createVehicle(userId, body);
+    return this.vehicleService.createListing(userId, body);
   }
 
-  // Get All Vehicles
+  // Get All Listings
   @Get()
-  async getAllVehicles(
+  async getAllListings(
     @Query('brand') brand?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -60,7 +60,7 @@ export class VehicleController {
     @Query('page') page?: string,
     @Query('limit') limit?: string
   ) {
-    return this.vehicleService.getAllVehicles({
+    return this.vehicleService.getAllListings({
       brand,
       minPrice,
       maxPrice,
@@ -72,26 +72,26 @@ export class VehicleController {
     });
   }
 
-  // Get a Specific Vehicle
+  // Get a Specific Listing
   @Get(':id')
-  async getVehicleById(@Param('id') vehicleId: string) {
-    const cleanedId = vehicleId.trim(); // Trim ID in the controller
-    return this.vehicleService.getVehicleById(cleanedId);
+  async getListingById(@Param('id') listingId: string) {
+    const cleanedId = listingId.trim(); // Trim ID in the controller
+    return this.vehicleService.getListingId(cleanedId);
 }
 
 
   // Update Vehicle
   @Put(':id')
-  async updateVehicle(@Request() req: AuthRequest, @Param('id') vehicleId: string, @Body() body: UpdateVehicleDto) {
+  async updateListing(@Request() req: AuthRequest, @Param('id') listingId: string, @Body() body: UpdateVehicleDto) {
     const userId = req.user.id;
-    return this.vehicleService.updateVehicle(userId, vehicleId, body);
+    return this.vehicleService.updateListing(userId, listingId, body);
   }
 
   // Delete (Soft Delete) Vehicle
   @Patch(':id')
-  async deleteVehicle(@Request() req: AuthRequest, @Param('id') vehicleId: string) {
+  async deleteListing(@Request() req: AuthRequest, @Param('id') listingId: string) {
     const userId = req.user.id;
-    return this.vehicleService.deleteVehicle(userId, vehicleId);
+    return this.vehicleService.deleteListing(userId, listingId);
   }
 }
 function ValidateNested(): (target: CreateVehicleDto, propertyKey: "location") => void {

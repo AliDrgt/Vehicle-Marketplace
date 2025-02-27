@@ -8,9 +8,9 @@ import { ForbiddenException } from '@nestjs/common';
 export class VehicleService {
   constructor(private prisma: PrismaService) {}
 
-  // Create a new vehicle
-  async createVehicle(userId: string, data: CreateVehicleDto) {
-    return this.prisma.vehicle.create({
+  // Create a new listing
+  async createListing(userId: string, data: CreateVehicleDto) {
+    return this.prisma.listing.create({
       data: {
         sellerId: userId,
         brand: data.brand,
@@ -33,7 +33,7 @@ export class VehicleService {
   
 
   // Get all vehicles
-  async getAllVehicles(query: any) {
+  async getAllListings(query: any) {
     const {
       brand,
       minPrice,
@@ -67,7 +67,7 @@ export class VehicleService {
     const skip = (Number(page) - 1) * Number(limit);
     const take = Number(limit);
 
-    return this.prisma.vehicle.findMany({
+    return this.prisma.listing.findMany({
       where: filters,
       orderBy,
       skip,
@@ -75,61 +75,61 @@ export class VehicleService {
     });
   }
 
-  // Get a single vehicle by ID
-  async getVehicleById(vehicleId: string) {
-    const cleanedId = vehicleId.trim(); // Trim the ID again (just in case)
-    const vehicle = await this.prisma.vehicle.findUnique({
+  // Get a single listing by ID
+  async getListingId(listingId: string) {
+    const cleanedId = listingId.trim(); // Trim the ID again (just in case)
+    const listing = await this.prisma.listing.findUnique({
       where: { id: cleanedId },
     });
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    if (!listing) {
+      throw new NotFoundException('listing not found');
     }
-    return vehicle;
+    return listing;
   }
   
   
   
 
-  // Update a vehicle listing
-  async updateVehicle(userId: string, vehicleId: string, data: UpdateVehicleDto) {
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
+  // Update a listing listing
+  async updateListing(userId: string, listingId: string, data: UpdateVehicleDto) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
     });
 
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    if (!listing) {
+      throw new NotFoundException('listing not found');
     }
 
-    if (vehicle.isDeleted) {
-      throw new NotFoundException('Vehicle is deleted and cannot be updated');
+    if (listing.isDeleted) {
+      throw new NotFoundException('listing is deleted and cannot be updated');
     }
 
-    if (vehicle.sellerId !== userId) {
-      throw new ForbiddenException('You are not allowed to modify this vehicle');
+    if (listing.sellerId !== userId) {
+      throw new ForbiddenException('You are not allowed to modify this listing');
     }
 
-    return this.prisma.vehicle.update({
-      where: { id: vehicleId },
+    return this.prisma.listing.update({
+      where: { id: listingId },
       data,
     });
   }
 
-  // Delete (soft delete) a vehicle
-  async deleteVehicle(userId: string, vehicleId: string) {
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
+  // Delete (soft delete) a listing
+  async deleteListing(userId: string, listingId: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
     });
 
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    if (!listing) {
+      throw new NotFoundException('listing not found');
     }
 
-    if (vehicle.sellerId !== userId) {
-      throw new NotFoundException('Unauthorized: You cannot delete this vehicle');
+    if (listing.sellerId !== userId) {
+      throw new NotFoundException('Unauthorized: You cannot delete this listing');
     }
 
-    return this.prisma.vehicle.update({
-      where: { id: vehicleId },
+    return this.prisma.listing.update({
+      where: { id: listingId },
       data: { isDeleted: true as boolean },
     });
   }
