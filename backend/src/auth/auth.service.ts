@@ -36,7 +36,7 @@ export class AuthService {
       role: user.role, 
     };
 
-    console.log('JWT Secret:', process.env.JWT_SECRET || 'your_secret_key');
+    
     const token = this.jwtService.sign(payload, { secret: 'your_secret_key' });
     return { accessToken: token };
   }

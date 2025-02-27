@@ -1,29 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateVehicleDto } from './vehicle.controller';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UpdateVehicleDto } from './vehicle.controller';
+import { ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class VehicleService {
   constructor(private prisma: PrismaService) {}
 
   // Create a new vehicle
-  async createVehicle(userId: string, data: any) {
+  async createVehicle(userId: string, data: CreateVehicleDto) {
     return this.prisma.vehicle.create({
       data: {
-        sellerId: userId, 
+        sellerId: userId,
         brand: data.brand,
         model: data.model,
         title: data.title,
         price: data.price,
         mileage: data.mileage,
         year: data.year,
-        fuelType: data.fuelType,
+        fuelType: data.fuelType || 'Unknown',
         transmission: data.transmission,
-        enginePower: data.enginePower,
+        enginePower: data.enginePower ?? 0,
         drivetrain: data.drivetrain,
         color: data.color,
         description: data.description,
-        location: data.location, // Must be valid JSON
-        isSecondHand: data.isSecondHand,
+        location: data.location as any, 
+        isSecondHand: data.isSecondHand ?? false, 
       },
     });
   }
@@ -74,6 +77,21 @@ export class VehicleService {
 
   // Get a single vehicle by ID
   async getVehicleById(vehicleId: string) {
+    const cleanedId = vehicleId.trim(); // Trim the ID again (just in case)
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: { id: cleanedId },
+    });
+    if (!vehicle) {
+      throw new NotFoundException('Vehicle not found');
+    }
+    return vehicle;
+  }
+  
+  
+  
+
+  // Update a vehicle listing
+  async updateVehicle(userId: string, vehicleId: string, data: UpdateVehicleDto) {
     const vehicle = await this.prisma.vehicle.findUnique({
       where: { id: vehicleId },
     });
@@ -82,21 +100,12 @@ export class VehicleService {
       throw new NotFoundException('Vehicle not found');
     }
 
-    return vehicle;
-  }
-
-  // Update a vehicle listing
-  async updateVehicle(userId: string, vehicleId: string, data: any) {
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
-    });
-
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    if (vehicle.isDeleted) {
+      throw new NotFoundException('Vehicle is deleted and cannot be updated');
     }
 
     if (vehicle.sellerId !== userId) {
-      throw new NotFoundException('Unauthorized: You cannot update this vehicle');
+      throw new ForbiddenException('You are not allowed to modify this vehicle');
     }
 
     return this.prisma.vehicle.update({

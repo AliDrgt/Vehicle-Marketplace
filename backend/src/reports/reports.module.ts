@@ -8,5 +8,6 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   controllers: [ReportsController],
   providers: [ReportsService, PrismaService, JwtService],
+  imports: [AuthModule],
 })
 export class ReportsModule {}

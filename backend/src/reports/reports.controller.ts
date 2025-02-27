@@ -30,7 +30,7 @@ export class ReportsController {
     @Param('reportId') reportId: string,
     @Body() body: { status: ReportStatus } 
   ) {
-    if (req.user.role !== 'admin') {
+    if (req.user.role !== 'ADMIN') {
       throw new ForbiddenException('Only admins can update reports');
     }
     return this.reportsService.updateReportStatus(reportId, body.status as ReportStatus); 
