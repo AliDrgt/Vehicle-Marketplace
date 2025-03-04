@@ -4,8 +4,8 @@ Overview of the Application’s Functionality:
 The Vehicle Marketplace is a web-based platform designed to simplify vehicle transactions. Sellers can create detailed listings with vehicle specifications, photos, and pricing, while buyers can explore and filter vehicles using advanced search options. Secure in-platform messaging enables buyers and sellers to communicate without sharing personal contact details. Additionally, the platform features an admin dashboard for managing users, listings, and disputes. Optional enhancements such as a vehicle comparison tool, email notifications for saved searches, a bookmark feature for favorites, and a chatbot for customer service aim to further improve user experience.
 
 Technology Stack:
-Frontend: React.js, Tailwind CSS
-Backend: Django or Node.js
+Frontend: Next.js
+Backend: Node.js(NestJS)
 Database: PostgreSQL
 APIs:
 Google Maps API or Mapbox (location-based searches)
@@ -13,6 +13,13 @@ Twilio API or Socket.IO (secure messaging)
 OpenAI API (chatbot integration)
 Hosting: AWS
 Version Control: Git
+
+Why Next.js?
+Next.js is chosen for its better performance, SEO optimization, and flexibility. Since the marketplace has public-facing vehicle listings, it needs search engines to index pages efficiently. Next.js allows pre-rendering using Static Site Generation (SSG) and Incremental Static Regeneration (ISR), making pages load faster and rank higher.
+It also provides hybrid rendering, built-in image optimization, and API routes, making it ideal for balancing speed, SEO, and scalability.
+
+
+
 
 Features to Be Implemented:
 Core Features:
@@ -228,7 +235,7 @@ Example:
 |--------|---------|-------------|--------------|
 | `POST` | `/reports` | Report a listing for fraud or violations | ✅ (User) |
 | `GET` | `/reports` | View all reports (admin only) | ✅ (Admin) |
-| `PUT` | `/reports/{id}` | Update report status (`open`, `under review`, `resolved`) | ✅ (Admin) |
+| `PUT` | `/reports/{reportId}` | Update report status (`OPEN`, `UNDER_REVIEW`, `RESOLVED`) | ✅ (Admin) |
 
 ---
 

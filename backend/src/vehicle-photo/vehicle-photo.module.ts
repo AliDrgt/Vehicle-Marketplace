@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { VehiclePhotoService } from './vehicle-photo.service';
 import { VehiclePhotoController } from './vehicle-photo.controller';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   controllers: [VehiclePhotoController],

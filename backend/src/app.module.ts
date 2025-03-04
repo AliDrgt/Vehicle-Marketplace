@@ -8,7 +8,7 @@ import { AdminModule } from './admin/admin.module';
 import { VehiclePhotoService } from './vehicle-photo/vehicle-photo.service';
 import { VehiclePhotoController } from './vehicle-photo/vehicle-photo.controller';
 import { VehiclePhotoModule } from './vehicle-photo/vehicle-photo.module';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 
 
 

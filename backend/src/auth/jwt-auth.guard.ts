@@ -1,7 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRequest } from './auth-request.interface';
-import { Request } from 'express';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -11,6 +10,18 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthRequest>();
     const authHeader = request.headers.authorization;
 
+    const publicRoutes = [
+      { path: "/listing", method: "GET" }, // Allow GET /listing
+      { path: "/listing/", method: "GET" }, // Allow GET /listing/:id (starts with "/listing/")
+    ];
+
+    // Check if the request matches a public route
+    if (publicRoutes.some(route => request.url.startsWith(route.path) && request.method === route.method)) {
+      console.log(`Public route accessed: ${request.url}`);
+      return true; // ✅ Allow access without authentication
+    }
+
+    // If it's not a public route, enforce authentication
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('Missing or malformed Authorization header');
       throw new UnauthorizedException('Invalid or missing authentication token');

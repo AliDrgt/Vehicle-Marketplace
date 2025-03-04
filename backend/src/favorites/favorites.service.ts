@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Favorite } from '@prisma/client';
 
 @Injectable()
@@ -8,35 +8,31 @@ export class FavoritesService {
 
   // Add to Favorites
   async addFavorite(userId: string, listingId: string): Promise<Favorite> {
-    // Check if the vehicle exists
-    const vehicle = await this.prisma.listing.findUnique({
-      where: { id: listingId },
+    // Check if the listing exists
+    const listing = await this.prisma.listing.findUnique({
+        where: { id: listingId },
     });
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    if (!listing) {
+        throw new NotFoundException("Listing not found");
     }
 
-    // Check if it's already favorited
-    const existingFavorite = await this.prisma.favorite.findUnique({
-      where: {
-        userId_listingId: {
-          userId,
-          listingId,
-        },
-      },
+    // Check if already favorited
+    const existingFavorite = await this.prisma.favorite.findFirst({
+        where: { userId, listingId }, // ✅ Use findFirst instead of findUnique
     });
+
     if (existingFavorite) {
-      throw new ForbiddenException('Vehicle already in favorites');
+        throw new ForbiddenException("Listing already in favorites");
     }
 
     // Add to favorites
     return this.prisma.favorite.create({
-      data: {
-        userId,
-        listingId,
-      },
+        data: {
+            userId,
+            listingId,
+        },
     });
-  }
+}
 
   // Get User’s Favorites
   async getUserFavorites(userId: string): Promise<Favorite[]> {
@@ -49,23 +45,19 @@ export class FavoritesService {
   }
 
   // Remove from Favorites
-  async removeFavorite(userId: string, favoriteId: string): Promise<void> {
-    const favorite = await this.prisma.favorite.findUnique({
-      where: { id: favoriteId },
+  async removeFavorite(userId: string, listingId: string): Promise<void> {
+    const favorite = await this.prisma.favorite.findFirst({
+        where: { userId, listingId }, //Find by `userId` and `listingId`
     });
 
     if (!favorite) {
-      throw new NotFoundException('Favorite not found');
-    }
-
-    if (favorite.userId !== userId) {
-      throw new ForbiddenException('You are not allowed to delete this favorite');
+        throw new NotFoundException("Favorite not found");
     }
 
     await this.prisma.favorite.delete({
-      where: { id: favoriteId },
+        where: { id: favorite.id },
     });
-  }
+}
 
   // Count Favorites for a Vehicle
   async countFavoritesForVehicle(listingId: string): Promise<number> {

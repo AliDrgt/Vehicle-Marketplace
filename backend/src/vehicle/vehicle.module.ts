@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ListingController } from './vehicle.controller';
 import { VehicleService } from './vehicle.service';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 
