@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CreateListingDto, UpdateVehicleDto } from './vehicle.controller';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService} from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class VehicleService {
@@ -59,23 +60,25 @@ export class VehicleService {
         if (fuelType) filters.fuelType = fuelType;
         if (transmission) filters.transmission = transmission;
     
-        const orderBy = [];
-        if (sort) {
+        const orderBy: Prisma.ListingOrderByWithRelationInput[] = [];
+        if (sort === 'newest') {
+            orderBy.push({ createdAt: 'desc' });
+        } else if (sort) {
             const [field, direction] = sort.split('_');
             if (['price', 'year', 'mileage'].includes(field) && ['asc', 'desc'].includes(direction)) {
-                orderBy.push({ [field]: direction });
+                orderBy.push({ [field]: direction as Prisma.SortOrder });
             }
         }
     
         const skip = (Number(page) - 1) * Number(limit);
         const take = Number(limit);
     
-        // 🔹 Get total count of listings (without pagination)
+        //  Get total count of listings (without pagination)
         const totalCount = await this.prisma.listing.count({
             where: filters,
         });
     
-        // 🔹 Fetch listings with pagination
+        //  Fetch listings with pagination
         const listings = await this.prisma.listing.findMany({
             where: filters,
             orderBy,
@@ -93,7 +96,7 @@ export class VehicleService {
         return {
             listings,
             totalPages,
-            totalCount,  // Optional: You can remove this if not needed
+            totalCount, 
             currentPage: Number(page),
             perPage: take,
         };

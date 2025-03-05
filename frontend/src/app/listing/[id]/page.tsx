@@ -71,11 +71,11 @@ export default function ListingDetails() {
                         "Authorization": `Bearer ${token}`,
                     },
                 });
-    
+                
                 if (!favoriteRes.ok) throw new Error("Failed to get favorite ID");
-    
                 const favorites = await favoriteRes.json();
                 const favorite = favorites.find((fav: { id: string; listingId: string }) => fav.listingId === id);
+                
 
     
                 if (!favorite) throw new Error("Favorite not found");

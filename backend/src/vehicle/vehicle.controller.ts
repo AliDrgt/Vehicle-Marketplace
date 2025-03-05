@@ -49,7 +49,7 @@ export class ListingController {
   }
 
   // Get All Listings
-  @Get()
+@Get()
 async getAllListings(
   @Query('brand') brand?: string,
   @Query('minPrice') minPrice?: string,
@@ -104,9 +104,5 @@ async getAllListings(
   async getModelsByBrand(@Param('brandId') brandId: number) {
     return this.vehicleService.getModelsByBrand(brandId);
   }
-}
-
-function ValidateNested(): (target: CreateListingDto, propertyKey: "location") => void {
-  throw new Error('Function not implemented.');
 }
 
