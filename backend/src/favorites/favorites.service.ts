@@ -47,7 +47,7 @@ export class FavoritesService {
   // Remove from Favorites
   async removeFavorite(userId: string, listingId: string): Promise<void> {
     const favorite = await this.prisma.favorite.findFirst({
-        where: { userId, listingId }, //Find by `userId` and `listingId`
+        where: { userId, listingId }, 
     });
 
     if (!favorite) {

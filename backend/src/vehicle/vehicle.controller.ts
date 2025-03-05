@@ -48,6 +48,13 @@ export class ListingController {
     return this.vehicleService.createListing(userId, body);
   }
 
+  @Get("/user/:sellerId")
+  async getUserListings(@Param('sellerId') sellerId: string) {
+    console.log("Fetching listings for seller:", sellerId);
+    return this.vehicleService.getUserListings(sellerId);
+  }
+
+
   // Get All Listings
 @Get()
 async getAllListings(
@@ -83,7 +90,7 @@ async getAllListings(
   async getListingById(@Param('id') listingId: string) {
     const cleanedId = listingId.trim(); // Trim ID in the controller
     return this.vehicleService.getListingById(cleanedId);
-}
+  }
 
   // Update Vehicle
   @Put(':id')
@@ -91,6 +98,8 @@ async getAllListings(
     const userId = req.user.id;
     return this.vehicleService.updateListing(userId, listingId, body);
   }
+
+  
 
   // Delete (Soft Delete) Vehicle
   @Patch(':id')

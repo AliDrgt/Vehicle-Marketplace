@@ -114,6 +114,19 @@ export class VehicleService {
         });
     }
 
+    async getUserListings(sellerId: string) {
+        console.log("Fetching listings for user ID:", sellerId);
+    
+        return this.prisma.listing.findMany({
+            where: { sellerId },
+            orderBy: { createdAt: "desc" },
+            include: {
+                brand: { select: { id: true, name: true } },
+                model: { select: { id: true, name: true } },
+            },
+        });
+    }
+
     // Update a listing
     async updateListing(userId: string, listingId: string, data: UpdateVehicleDto) {
         const listing = await this.prisma.listing.findUnique({ where: { id: listingId } });
