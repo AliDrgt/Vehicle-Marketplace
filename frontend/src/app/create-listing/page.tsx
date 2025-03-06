@@ -1,14 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
 
 export default function CreateListing() {
     type Model = { id: number; name: string };
     const [models, setModels] = useState<Model[]>([]);
     type Brand = { id: number; name: string };
     const [brands, setBrands] = useState<Brand[]>([]);
+    const searchParams = useSearchParams();
+    const listingId = searchParams.get("id"); //Get listing ID from URL
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         brandId: "",
@@ -29,6 +34,37 @@ export default function CreateListing() {
 
     // Fetch Brands
     useEffect(() => {
+
+      if (listingId) {
+        fetch(`${API_BASE}/listing/${listingId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setFormData({
+                    brandId: String(data.brand.id),
+                    modelId: String(data.model.id),
+                    title: data.title,
+                    price: String(data.price),
+                    mileage: String(data.mileage),
+                    year: String(data.year),
+                    fuelType: data.fuelType,
+                    transmission: data.transmission,
+                    drivetrain: data.drivetrain,
+                    color: data.color,
+                    description: data.description,
+                    location: data.location,
+                    enginePower: String(data.enginePower || ""),
+                    isSecondHand: Boolean(data.isSecondHand),
+                });
+                //Fetch models for the selected brand
+                fetch(`${API_BASE}/listing/brands/${data.brand.id}/models`)
+                    .then((res) => res.json())
+                    .then((modelsData) => setModels(modelsData || []))
+                    .catch(() => setModels([]));
+            })
+            .catch((err) => console.error("Error fetching listing:", err));
+      }
+
+
         const token = localStorage.getItem("token");
         if (!token) {
             console.error("No auth token found in localStorage");
@@ -45,7 +81,7 @@ export default function CreateListing() {
             .then((res) => res.json())
             .then((data) => setBrands(Array.isArray(data) ? data : []))
             .catch((err) => console.error("Error fetching brands:", err));
-    }, []);
+    }, [listingId]);
 
     // Fetch Models when a Brand is selected
     const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -69,10 +105,13 @@ export default function CreateListing() {
             .then((data) => setModels(Array.isArray(data) ? data : []))
             .catch(() => setModels([]));
     };
-
+    
     // Handle Form Submission
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const method = listingId ? "PUT" : "POST"; //PUT for editing, POST for creating
+        const url = listingId ? `${API_BASE}/listing/${listingId}` : `${API_BASE}/listing`;
+        
 
         const token = localStorage.getItem("token");
         if (!token) {
@@ -92,30 +131,31 @@ export default function CreateListing() {
         };
 
         try {
-            const response = await fetch(`${API_BASE}/listing`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(listingData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                alert(`Error creating listing: ${errorData.message || "Unknown error"}`);
-            } else {
-                alert("Listing created successfully!");
-            }
-        } catch {
-            alert("Failed to create listing.");
-        }
+          const response = await fetch(url, {
+              method,
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(listingData),
+          });
+      
+          if (!response.ok) {
+              const errorData = await response.json();
+              alert(`Error: ${errorData.message || "Unknown error"}`);
+          } else {
+              alert(listingId ? "Listing updated successfully!" : "Listing created successfully!");
+              router.push("/dashboard");
+          }
+      } catch {
+          alert("Failed to process the listing.");
+      }
     };
 
     return (
         <div className="max-w-3xl mx-auto p-8 bg-white shadow-xl rounded-lg mt-6">
           <h1 className="text-3xl font-extrabold mb-6 text-gray-800 text-center">
-            Create a Listing
+            {listingId ? "Edit Listing" : "Create a Listing"}
           </h1>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
             {/* Brand */}
@@ -349,12 +389,9 @@ export default function CreateListing() {
       
             {/* Submit Button */}
             <div className="col-span-2 text-center">
-              <button
-                type="submit"
-                className="bg-blue-600 text-white p-3 w-full text-lg font-semibold rounded-md hover:bg-blue-700 transition-all"
-              >
-                Create Listing
-              </button>
+            <button type="submit" className="bg-blue-600 text-white p-3 w-full text-lg font-semibold rounded-md hover:bg-blue-700 transition-all">
+              {listingId ? "Update Listing" : "Create Listing"}
+            </button>
             </div>
           </form>
         </div>
