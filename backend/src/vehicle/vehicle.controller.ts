@@ -2,7 +2,7 @@ import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Request, Qu
 import { VehicleService } from './vehicle.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthRequest } from '../auth/auth-request.interface';
-import { IsString, IsNumber, IsBoolean, IsOptional, IsObject } from 'class-validator'; 
+import { IsString, IsNumber, IsBoolean, IsOptional, IsObject, IsArray } from 'class-validator'; 
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 
@@ -25,6 +25,11 @@ export class CreateListingDto {
   // Optional fields
   @IsNumber() @IsOptional() enginePower?: number;
   @IsBoolean() @IsOptional() isSecondHand?: boolean;
+
+  @IsArray()
+  @IsString({ each: true }) // Ensure each element is a string
+  @IsOptional()
+  photos?: string[];
 }
 
 class LocationDto {

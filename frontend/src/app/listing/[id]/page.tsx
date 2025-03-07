@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider"; // Adjust import as needed
+import { CldImage } from "next-cloudinary";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -19,6 +20,7 @@ type Listing = {
   drivetrain: string;
   color: string;
   description: string;
+  photos:{photoUrl: string }[];
 };
 
 export default function ListingDetails() {
@@ -41,6 +43,7 @@ export default function ListingDetails() {
     fetch(`${API_BASE}/listing/${id}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Fetched listing data:", data);
         if (data && data.id) {
           setListing(data);
         } else {
@@ -78,7 +81,7 @@ export default function ListingDetails() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ listing_id: id }), // ✅ Send listing_id in body
+                body: JSON.stringify({ listing_id: id }), //Send listing_id in body
             });
 
             if (!deleteRes.ok) throw new Error("Failed to remove favorite");
@@ -184,6 +187,26 @@ export default function ListingDetails() {
         <p>
           <strong>Color:</strong> {listing.color}
         </p>
+      </div>
+      <div className="mt-4">
+        <h2 className="text-lg font-semibold text-black">Vehicle Photos:</h2>
+        {listing.photos && listing.photos.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+            {listing.photos?.map((photo, index) => (
+                <CldImage
+                    key={index}
+                    src={photo.photoUrl} //Ensure we're accessing `photo.photoUrl`
+                    width="300"
+                    height="200"
+                    alt={`Listing photo ${index + 1}`}
+                    className="rounded-lg shadow-md"
+                    onError={(e) => (e.currentTarget.src = "/fallback-image.jpg")} // ✅ Use fallback image if loading fails
+                />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No photos available.</p>
+        )}
       </div>
       <div className="mt-4">
         <h2 className="text-lg font-semibold text-black">Description:</h2>

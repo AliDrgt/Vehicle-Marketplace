@@ -9,13 +9,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 type Listing = {
   id: string;
-  imageUrl?: string;
   title: string;
   brand: { name: string };
   model: { name: string };
   year: number;
   mileage: number;
   price: number;
+  photos: { photoUrl: string }[];
 };
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -96,7 +96,7 @@ export default function ListingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-900">Find Your Perfect Car</h1>
+      <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-900">MALAVVVVV</h1>
 
       {/* Filters Section */}
       <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-md flex flex-wrap gap-4 justify-center border border-gray-300">
@@ -204,11 +204,12 @@ export default function ListingsPage() {
           listings.map((listing) => (
             <Link key={listing.id} href={`/listing/${listing.id}`} className="block border rounded-lg overflow-hidden shadow hover:shadow-lg bg-white">
               <Image
-                src={listing.imageUrl && listing.imageUrl.startsWith("http") ? listing.imageUrl : "/placeholder.jpg"}
+                src={listing.photos?.length > 0 ? listing.photos[0].photoUrl : "/placeholder.jpg"} // Fallback image
                 alt={listing.title || "No Image Available"}
                 width={500}
                 height={200}
                 className="w-full h-48 object-cover bg-gray-200"
+                unoptimized={listing.photos?.length === 0} // Skip optimization if no photo
               />
               <div className="p-4">
               <h2 className="text-lg font-semibold text-gray-900">{listing.brand.name} {listing.model.name}</h2>

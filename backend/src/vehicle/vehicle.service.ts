@@ -33,6 +33,9 @@ export class VehicleService {
                 description: data.description,
                 location: data.location,
                 isSecondHand: data.isSecondHand ?? false,
+                photos: {
+                    create: (data.photos || []).map(photoUrl => ({ photoUrl }))
+                }
             },
         });
     }
@@ -87,6 +90,7 @@ export class VehicleService {
             include: {
                 brand: { select: { id: true, name: true } },
                 model: { select: { id: true, name: true } },
+                photos: { select: { photoUrl: true } },
             },
         });
     
@@ -110,6 +114,7 @@ export class VehicleService {
             include: {
                 brand: { select: { id: true, name: true } },
                 model: { select: { id: true, name: true } },
+                photos: { select: { photoUrl: true } },
             },
         });
     }
@@ -129,14 +134,49 @@ export class VehicleService {
 
     // Update a listing
     async updateListing(userId: string, listingId: string, data: UpdateVehicleDto) {
-        const listing = await this.prisma.listing.findUnique({ where: { id: listingId } });
-
+        const listing = await this.prisma.listing.findUnique({
+            where: { id: listingId },
+            include: { photos: true } // Fetch existing photos
+        });
+    
         if (!listing) throw new NotFoundException('Listing not found');
         if (listing.isDeleted) throw new NotFoundException('Listing is deleted and cannot be updated');
         if (listing.sellerId !== userId) throw new ForbiddenException('Unauthorized');
-
-        return this.prisma.listing.update({ where: { id: listingId }, data });
+    
+        // Get existing photo URLs
+        const existingPhotoUrls = listing.photos.map(photo => photo.photoUrl);
+    
+        return this.prisma.listing.update({
+            where: { id: listingId },
+            data: {
+                brandId: data.brandId,
+                modelId: data.modelId,
+                title: data.title,
+                price: data.price,
+                mileage: data.mileage,
+                year: data.year,
+                fuelType: data.fuelType,
+                transmission: data.transmission,
+                drivetrain: data.drivetrain,
+                color: data.color,
+                description: data.description,
+                location: data.location,
+                enginePower: data.enginePower,
+                isSecondHand: data.isSecondHand,
+    
+                // ✅ Update photos correctly
+                photos: {
+                    deleteMany: {
+                        photoUrl: { notIn: data.photos || [] } // Remove photos not included in the update
+                    },
+                    create: (data.photos || [])
+                        .filter(photoUrl => !existingPhotoUrls.includes(photoUrl)) // Only add new photos
+                        .map(photoUrl => ({ photoUrl }))
+                }
+            }
+        });
     }
+    
 
     // Delete (soft delete) a listing
     async deleteListing(userId: string, listingId: string) {
