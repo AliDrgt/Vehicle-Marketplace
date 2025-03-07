@@ -96,7 +96,7 @@ export default function ListingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-900">MALAVVVVV</h1>
+      <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-900">Find Your Perfect Car</h1>
 
       {/* Filters Section */}
       <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-md flex flex-wrap gap-4 justify-center border border-gray-300">

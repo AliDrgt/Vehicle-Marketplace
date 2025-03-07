@@ -60,7 +60,7 @@ async function fetchAndStoreCarModels() {
         const response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/${formattedBrandName}?format=json`);
   
         if (!response.data.Results || response.data.Results.length === 0) {
-          console.warn(`⚠️No models found for brand ${brand.name}. Keeping in database.`);
+          console.warn(`No models found for brand ${brand.name}. Keeping in database.`);
           continue;
         }
   
@@ -78,12 +78,12 @@ async function fetchAndStoreCarModels() {
           });
         }
   
-        console.log(`✅ Stored ${models.length} models for ${brand.name}`);
+        console.log(`Stored ${models.length} models for ${brand.name}`);
       }
   
-      console.log("✅ All valid car models successfully stored!");
+      console.log("All valid car models successfully stored!");
     } catch (error) {
-      console.error("❌ Error fetching car models:", error);
+      console.error("Error fetching car models:", error);
     } finally {
       await prisma.$disconnect();
     }

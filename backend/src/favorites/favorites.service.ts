@@ -18,7 +18,7 @@ export class FavoritesService {
 
     // Check if already favorited
     const existingFavorite = await this.prisma.favorite.findFirst({
-        where: { userId, listingId }, // ✅ Use findFirst instead of findUnique
+        where: { userId, listingId }, 
     });
 
     if (existingFavorite) {

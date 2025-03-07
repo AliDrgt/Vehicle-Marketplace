@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <AuthProvider> {/* ✅ Wrap the whole app in AuthProvider */}
+        <AuthProvider> {/* Wrap the whole app in AuthProvider */}
           <Navbar />
           <main className="pt-16">{children}</main>
         </AuthProvider>

@@ -18,7 +18,7 @@ export class JwtAuthGuard implements CanActivate {
     // Check if the request matches a public route
     if (publicRoutes.some(route => request.url.startsWith(route.path) && request.method === route.method)) {
       console.log(`Public route accessed: ${request.url}`);
-      return true; // ✅ Allow access without authentication
+      return true; //Allow access without authentication
     }
 
     // If it's not a public route, enforce authentication

@@ -164,7 +164,7 @@ export class VehicleService {
                 enginePower: data.enginePower,
                 isSecondHand: data.isSecondHand,
     
-                // ✅ Update photos correctly
+                // Update photos correctly
                 photos: {
                     deleteMany: {
                         photoUrl: { notIn: data.photos || [] } // Remove photos not included in the update

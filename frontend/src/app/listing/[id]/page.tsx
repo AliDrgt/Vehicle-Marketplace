@@ -200,7 +200,7 @@ export default function ListingDetails() {
                     height="200"
                     alt={`Listing photo ${index + 1}`}
                     className="rounded-lg shadow-md"
-                    onError={(e) => (e.currentTarget.src = "/fallback-image.jpg")} // ✅ Use fallback image if loading fails
+                    onError={(e) => (e.currentTarget.src = "/fallback-image.jpg")} //Use fallback image if loading fails
                 />
             ))}
           </div>

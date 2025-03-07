@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode"; // ✅ Use named import
+import { jwtDecode } from "jwt-decode";
 
 // Define the type for the decoded JWT payload
 interface JwtPayload {
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (storedToken) {
       setToken(storedToken);
       try {
-        const decoded: JwtPayload = jwtDecode<JwtPayload>(storedToken); // ✅ Correctly typed
+        const decoded: JwtPayload = jwtDecode<JwtPayload>(storedToken);
         setUser({ id: decoded.id });
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
     try {
-      const decoded: JwtPayload = jwtDecode<JwtPayload>(newToken); // ✅ Correctly typed
+      const decoded: JwtPayload = jwtDecode<JwtPayload>(newToken);
       setUser({ id: decoded.id });
     } catch (error) {
       console.error("Error decoding token during login:", error);

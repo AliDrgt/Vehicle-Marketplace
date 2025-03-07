@@ -44,7 +44,7 @@ export default function CreateListing() {
         fetch(`${API_BASE}/listing/${listingId}`)
             .then((res) => res.json())
             .then((data) => {
-                setFormData({
+                setFormData({//Populate form with existing listing data
                     brandId: String(data.brand.id),
                     modelId: String(data.model.id),
                     title: data.title,
@@ -130,7 +130,7 @@ export default function CreateListing() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const method = listingId ? "PUT" : "POST"; //PUT for editing, POST for creating
-        const url = listingId ? `${API_BASE}/listing/${listingId}` : `${API_BASE}/listing`;
+        const url = listingId ? `${API_BASE}/listing/${listingId}` : `${API_BASE}/listing`; //URL for editing or creating
         
 
         const token = localStorage.getItem("token");
