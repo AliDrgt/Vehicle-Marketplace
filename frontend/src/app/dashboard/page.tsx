@@ -119,20 +119,53 @@ interface Listing {
 }
 
 function ListingsSection({ listings }: { listings: Listing[] }) {
+  const { token } = useAuth(); // ✅ Get token from AuthProvider
+
+  const handleDelete = async (listingId: string) => {
+    console.log("🔹 Deleting listing:", listingId);
+    console.log("🔹 Token being sent:", token); // ✅ Debugging
+
+    if (!confirm("Are you sure you want to delete this listing?")) return;
+
+    try {
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+        };
+
+        console.log("🔹 Headers being sent:", headers); // ✅ Log headers
+
+        const res = await fetch(`${API_BASE}/listing/${listingId}`, {
+            method: "PATCH", // ✅ Should be PATCH, not DELETE
+            headers,
+            body: JSON.stringify({ isDeleted: true }), // ✅ Soft delete
+        });
+
+        console.log("🔹 Response status:", res.status);
+
+        if (!res.ok) {
+            throw new Error("Failed to delete listing");
+        }
+
+        alert("Listing deleted successfully.");
+        window.location.reload();
+    } catch (error) {
+        console.error("❌ Error deleting listing:", error);
+        alert("Error deleting listing. Please try again.");
+    }
+};
+
   return (
     <section className="mt-8" aria-label="My Listings">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">My Listings</h2>
       {listings.length ? (
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {listings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} onDelete={handleDelete} />
           ))}
         </ul>
       ) : (
         <div className="flex flex-col items-center justify-center py-10">
-          <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V7a2 2 0 012-2h3.6a1 1 0 01.8.4l1.6 2h5a1 1 0 01.8.4l1.6 2H19a2 2 0 012 2v8a2 2 0 01-2 2z" />
-          </svg>
           <p className="text-gray-400">You have no active listings.</p>
         </div>
       )}
@@ -141,7 +174,8 @@ function ListingsSection({ listings }: { listings: Listing[] }) {
 }
 
 
-function ListingCard({ listing }: { listing: Listing }) {
+
+function ListingCard({ listing, onDelete }: { listing: Listing; onDelete: (id: string) => void }) {
   return (
     <li className="bg-white border border-gray-200 p-6 rounded-xl shadow hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex flex-col">
       <Link href={`/listing/manage/${listing.id}`}>
@@ -152,7 +186,7 @@ function ListingCard({ listing }: { listing: Listing }) {
         <Link href={`/create-listing/?id=${listing.id}`}>
           <span className="text-sm text-green-600 hover:underline">Edit</span>
         </Link>
-        <button className="text-sm text-red-600 hover:underline" onClick={() => console.log("Delete", listing.id)}>
+        <button className="text-sm text-red-600 hover:underline" onClick={() => onDelete(listing.id)}>
           Delete
         </button>
       </div>

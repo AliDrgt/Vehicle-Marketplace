@@ -123,7 +123,7 @@ export class VehicleService {
         console.log("Fetching listings for user ID:", sellerId);
     
         return this.prisma.listing.findMany({
-            where: { sellerId },
+            where: { sellerId, isDeleted: false },
             orderBy: { createdAt: "desc" },
             include: {
                 brand: { select: { id: true, name: true } },
@@ -180,11 +180,27 @@ export class VehicleService {
 
     // Delete (soft delete) a listing
     async deleteListing(userId: string, listingId: string) {
-        const listing = await this.prisma.listing.findUnique({ where: { id: listingId } });
-
-        if (!listing) throw new NotFoundException('Listing not found');
-        if (listing.sellerId !== userId) throw new ForbiddenException('Unauthorized');
-
-        return this.prisma.listing.update({ where: { id: listingId }, data: { isDeleted: true } });
+        console.log(`Attempting to delete listing: ${listingId} by user: ${userId}`); // Debug
+        const listing = await this.prisma.listing.findUnique({ where: { id: listingId } }); 
+    
+        if (!listing) {
+            console.log(`❌ Listing not found: ${listingId}`);
+            throw new NotFoundException("Listing not found");
+        }
+    
+        console.log(`isting found: ${listingId}, Seller: ${listing.sellerId}, isDeleted: ${listing.isDeleted}`); // Debug
+    
+    
+        //only the owner or an admin can delete
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    
+        if (listing.sellerId !== userId && user?.role?.toLowerCase() !== "admin") {
+            throw new ForbiddenException("You are not authorized to delete this listing.");
+        }
+    
+        return this.prisma.listing.update({
+            where: { id: listingId },
+            data: { isDeleted: true },
+        });
     }
 }

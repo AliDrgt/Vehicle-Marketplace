@@ -104,11 +104,12 @@ async getAllListings(
     return this.vehicleService.updateListing(userId, listingId, body);
   }
 
-  
-
   // Delete (Soft Delete) Vehicle
   @Patch(':id')
   async deleteListing(@Request() req: AuthRequest, @Param('id') listingId: string) {
+    console.log(`🔹 Received DELETE request for listing: ${listingId}`);
+    console.log(`🔹 Full request object:`, req); // ✅ Debug full request object
+    console.log(`🔹 Request User:`, req.user); // ✅ Check if req.user exists
     const userId = req.user.id;
     return this.vehicleService.deleteListing(userId, listingId);
   }
