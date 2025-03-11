@@ -107,9 +107,9 @@ async getAllListings(
   // Delete (Soft Delete) Vehicle
   @Patch(':id')
   async deleteListing(@Request() req: AuthRequest, @Param('id') listingId: string) {
-    console.log(`🔹 Received DELETE request for listing: ${listingId}`);
-    console.log(`🔹 Full request object:`, req); // ✅ Debug full request object
-    console.log(`🔹 Request User:`, req.user); // ✅ Check if req.user exists
+    console.log(`Received DELETE request for listing: ${listingId}`);
+    console.log(`Full request object:`, req); //Debug
+    console.log(`Request User:`, req.user); //Debug
     const userId = req.user.id;
     return this.vehicleService.deleteListing(userId, listingId);
   }

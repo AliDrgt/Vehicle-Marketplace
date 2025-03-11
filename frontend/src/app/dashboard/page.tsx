@@ -33,7 +33,7 @@ export default function UserDashboard() {
           .then((res) => res.json())
           .catch((err) => {
             console.error("Error fetching favorites:", err);
-            return []; // Fallback to an empty array on error
+            return []; 
           });
     
         // Extract `listing` object from each favorite
@@ -119,11 +119,11 @@ interface Listing {
 }
 
 function ListingsSection({ listings }: { listings: Listing[] }) {
-  const { token } = useAuth(); // ✅ Get token from AuthProvider
+  const { token } = useAuth();
 
   const handleDelete = async (listingId: string) => {
     console.log("🔹 Deleting listing:", listingId);
-    console.log("🔹 Token being sent:", token); // ✅ Debugging
+    console.log("🔹 Token being sent:", token); // Debugging
 
     if (!confirm("Are you sure you want to delete this listing?")) return;
 
@@ -133,12 +133,12 @@ function ListingsSection({ listings }: { listings: Listing[] }) {
             "Content-Type": "application/json",
         };
 
-        console.log("🔹 Headers being sent:", headers); // ✅ Log headers
+        console.log("Headers being sent:", headers); // Debugging
 
         const res = await fetch(`${API_BASE}/listing/${listingId}`, {
-            method: "PATCH", // ✅ Should be PATCH, not DELETE
+            method: "PATCH",
             headers,
-            body: JSON.stringify({ isDeleted: true }), // ✅ Soft delete
+            body: JSON.stringify({ isDeleted: true }), //Soft delete
         });
 
         console.log("🔹 Response status:", res.status);
