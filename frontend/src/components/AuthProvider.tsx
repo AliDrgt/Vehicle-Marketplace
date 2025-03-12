@@ -5,12 +5,13 @@ import { jwtDecode } from "jwt-decode";
 // Define the type for the decoded JWT payload
 interface JwtPayload {
   id: string;
+  role: string; 
   exp: number; // Token expiration time
 }
 
 interface AuthContextType {
   token: string | null;
-  user: { id: string } | null;
+  user: { id: string; role: string } | null;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -19,16 +20,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; role: string } | null>(null);
 
-  // Extract user ID from the token when loading
+  // Extract user ID and role from the token when loading
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
       try {
         const decoded: JwtPayload = jwtDecode<JwtPayload>(storedToken);
-        setUser({ id: decoded.id });
+        setUser({ id: decoded.id, role: decoded.role }); // Store role
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(newToken);
     try {
       const decoded: JwtPayload = jwtDecode<JwtPayload>(newToken);
-      setUser({ id: decoded.id });
+      setUser({ id: decoded.id, role: decoded.role }); // Store role
     } catch (error) {
       console.error("Error decoding token during login:", error);
     }

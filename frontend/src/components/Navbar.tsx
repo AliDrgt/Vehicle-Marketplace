@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthProvider";
 
 export default function Navbar() {
   console.log("Navbar is rendering...");
-  const { token, logout } = useAuth(); 
+  const { token, logout, user } = useAuth(); 
   console.log("Navbar Token:", token);
   const router = useRouter();
 
@@ -24,8 +24,13 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center space-x-6">
             <Link href="/listings" className="text-gray-700 hover:text-blue-600 cursor-pointer">Listings</Link>
-            <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 cursor-pointer">Dashboard</Link>
-            <Link href="/create-listing" className="text-gray-700 hover:text-blue-600 cursor-pointer">+ Create Listing</Link>
+            <Link 
+              href={user?.role === "ADMIN" ? "/admin" : "/dashboard"} 
+              className="text-gray-700 hover:text-blue-600 cursor-pointer"
+            >
+              {user?.role === "admin" ? "Admin Panel" : "Dashboard"}
+            </Link>
+            <Link href="/listing/create-listing" className="text-gray-700 hover:text-blue-600 cursor-pointer">+ Create Listing</Link>
             
 
             {token ? (

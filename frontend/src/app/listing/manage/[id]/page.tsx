@@ -92,7 +92,7 @@ export default function ManageListing() {
 
       <div className="mt-6 flex space-x-4">
       <button
-        onClick={() => router.push(`/create-listing?id=${listing.id}`)} //Pass ID for editing
+        onClick={() => router.push(`/listing/create-listing?id=${listing.id}`)} //Pass ID for editing
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
         Edit Listing

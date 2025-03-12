@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Param, Body, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Param, Body, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthRequest } from '../auth/auth-request.interface'; 
@@ -24,7 +24,7 @@ export class ReportsController {
     return this.reportsService.getAllReports();
   }
 
-  @Put(':reportId')
+  @Patch(':reportId')
   async updateReportStatus(
     @Request() req: AuthRequest,
     @Param('reportId') reportId: string,
