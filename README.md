@@ -26,12 +26,13 @@ Core Features:
 User Authentication (email/password, role-based access for buyers/sellers, and admins).
 Vehicle Listings with details like make, model, year, price, mileage, and photos and more.
 Advanced Search and Filters (location, price, vehicle type, mileage, engine power, and year).
-Secure Messaging between buyers and sellers.
 Admin Dashboard to manage users, listings, and disputes.
+Bookmark Feature for users easy access to their favorite listings.
+
 Optional Features:
+Secure Messaging between buyers and sellers.
 Vehicle Comparison Tool for side-by-side evaluation.
 Notifications via email for buyers when new listings match their search criteria.
-Bookmark Feature for users easy access to their favorite listings.
 Chatbot for customer service.
 Mobile compatible.(specify max-min resolution in readme)
 
@@ -54,10 +55,15 @@ Stores user information. Users can act as both buyers and sellers, with an admin
 | `password`    | String             | Hashed password                 |
 | `name`        | String             | Full name                       |
 | `phone_number` | String            | Contact number                  |
-| `role`        | ENUM("user", "admin") | Defines privileges          |
-| `profile_picture` | String (Optional) | Profile image URL          |
+| `role`        | ENUM("user", "admin") | Defines privileges           |
+| `profile_picture` | String (Optional) | Profile image URL            |
 | `created_at`  | Timestamp          | When the account was created    |
 | `updated_at`  | Timestamp          | Last profile update             |
+| `listings`    | Listing[]          | All Listings                    |
+| `favorites`   | Favorite[]         | User Favorites                  |
+| `reports`     | Report[]           | User Reports                    |
+| `isDeleted`   | Boolean            | Soft Delete Bool                |
+
 
 ---
 
@@ -67,21 +73,30 @@ Stores vehicle listings with detailed specifications.
 | Field          | Type                | Description                            |
 | ------------- | ------------------ | -------------------------------------- |
 | `id`         | UUID (Primary Key)   | Unique vehicle identifier             |
-| `seller_id`  | UUID (Foreign Key → User) | Seller’s ID                     |
-| `brand`      | String               | Brand of the vehicle                  |
-| `model`      | String               | Model of the car                      |
+| `sellerId`   | UUID (Foreign Key → User) | ID of the seller                     |
+| `seller`     | Relation (User)      | Seller details                         |
+| `brandId`    | Integer (Foreign Key → CarBrand) | ID of the vehicle brand        |
+| `brand`      | Relation (CarBrand)  | Brand details                          |
+| `modelId`    | Integer (Foreign Key → CarModel) | ID of the car model            |
+| `model`      | Relation (CarModel)  | Model details                          |
 | `title`      | String               | Listing title (e.g., "Aston Martin V8") |
-| `price`      | Decimal              | Vehicle price                         |
+| `price`      | Float                | Vehicle price                         |
 | `mileage`    | Integer              | Kilometers driven                     |
-| `year`       | Integer              | Model year                             |
-| `fuel_type`  | String               | Fuel type (Petrol, Diesel, Electric)  |
-| `transmission` | String             | Manual or Automatic                   |
-| `engine_power` | Integer            | Horsepower/kW                         |
+| `year`       | Integer              | Model year                            |
+| `fuelType`   | String               | Fuel type (Petrol, Diesel, Hybrid, Electric) |
+| `transmission` | String             | Manual, Automatic, Semi-Automatic     |
+| `enginePower` | Integer             | Horsepower/kW                         |
 | `drivetrain` | String               | FWD, RWD, AWD                         |
 | `color`      | String               | Exterior color                         |
 | `description` | Text                | Seller-provided details               |
 | `location`   | JSON (lat, lng)      | Geolocation for searches              |
-| `is_second_hand` | Boolean          | Indicates if used/new                 |
+| `isSecondHand` | Boolean            | Indicates if used or new              |
+| `photos`     | Array (VehiclePhoto[]) | Images associated with the listing   |
+| `favorites`  | Array (Favorite[])   | Users who favorited the listing       |
+| `reports`    | Array (Report[])     | Reports associated with this listing  |
+| `createdAt`  | DateTime (default: now()) | Timestamp when the listing was created |
+| `updatedAt`  | DateTime (auto-update) | Timestamp when the listing was last updated |
+| `isDeleted`  | Boolean (default: false) | Soft delete flag for listings |
 
 ---
 
@@ -112,23 +127,25 @@ Instead of a separate table, this is stored as a **JSON field** inside the `Vehi
 ### Vehicle Photo Table
 Manages multiple photos for each vehicle.
 
-| Field        | Type                 | Description                  |
-| ------------ | ------------------- | ---------------------------- |
-| `id`        | UUID (Primary Key)   | Unique photo ID              |
-| `vehicle_id` | UUID (Foreign Key → Vehicle) | Associated vehicle ID |
-| `photo_url` | String               | URL to stored image          |
+| Field       | Type                     | Description                          |
+|------------|--------------------------|--------------------------------------|
+| `id`       | UUID (Primary Key)       | Unique photo identifier             |
+| `listingId` | UUID (Foreign Key → Listing) | Associated listing ID           |
+| `listing`  | Relation (Listing)       | Reference to the associated listing |
+| `photoUrl` | String                   | URL to the stored image             |
+| `createdAt` | DateTime (default: now()) | Timestamp when the photo was added  |
 
 ---
 
 ### Favorites Table
 Allows users to save vehicle listings.
 
-| Field       | Type                  | Description                    |
-| ----------- | -------------------- | ------------------------------ |
-| `id`       | UUID (Primary Key)    | Unique favorite ID             |
-| `user_id`  | UUID (Foreign Key → User) | The user who favorited it |
-| `vehicle_id` | UUID (Foreign Key → Vehicle) | Favorited vehicle |
-| `created_at` | Timestamp            | Date favorited                 |
+| Field       | Type                     | Description                        |
+|------------|--------------------------|------------------------------------|
+| `id`       | UUID (Primary Key)       | Unique favorite identifier        |
+| `userId`   | UUID (Foreign Key → User) | The user who favorited the listing |
+| `listingId` | UUID (Foreign Key → Listing) | Favorited listing ID            |
+| `createdAt` | DateTime (default: now()) | Timestamp when favorited         |
 
 ---
 
@@ -152,14 +169,37 @@ Future feature of making it real-time chat.
 ### Report Table (User Reports)
 Users can report listings for fraud, disputes, or violations.
 
-| Field       | Type                   | Description                   |
-| ----------- | --------------------- | ----------------------------- |
-| `id`       | UUID (Primary Key)     | Unique report ID              |
-| `reporter_id` | UUID (Foreign Key → User) | User who reported |
-| `listing_id` | UUID (Foreign Key → Vehicle) | Reported listing |
-| `reason`   | Text                   | Report description            |
-| `status`   | ENUM("open", "under review", "resolved") | Status tracking |
-| `created_at` | Timestamp             | Date report was submitted     |
+| Field        | Type                                      | Description                     |
+|-------------|------------------------------------------|---------------------------------|
+| `id`        | UUID (Primary Key)                      | Unique report identifier       |
+| `reporterId` | UUID (Foreign Key → User)               | User who submitted the report  |
+| `listingId`  | UUID (Foreign Key → Listing)            | Listing that was reported      |
+| `reason`    | String                                   | Description of the report issue |
+| `status`    | ENUM("OPEN", "UNDER_REVIEW", "RESOLVED") | Current status of the report   |
+| `createdAt` | DateTime (default: now())               | Timestamp when report was created |
+
+### Car Brand Table
+The CarBrand table stores unique car brands, ensuring that each brand is distinctly identified and linked to multiple models and listings.
+
+| Field    | Type                 | Description                                    |
+|----------|---------------------|------------------------------------------------|
+| `id`     | Int (Primary Key)    | Unique identifier for each brand              |
+| `name`   | String (Unique)      | Name of the car brand (e.g., "Toyota", "BMW") |
+| `models` | Relation (CarModel)  | List of car models associated with this brand |
+| `listings` | Relation (Listing) | Listings that belong to this car brand        |
+
+### Car Model Table
+The CarModel table stores vehicle models linked to specific car brands and their associated listings.
+
+| Field     | Type                 | Description                                      |
+|-----------|---------------------|--------------------------------------------------|
+| `id`      | Int (Primary Key)    | Unique identifier for each car model            |
+| `name`    | String               | Name of the car model (e.g., "Corolla", "X5")   |
+| `brandId` | Int (Foreign Key → CarBrand) | ID of the associated car brand       |
+| `brand`   | Relation (CarBrand)  | Reference to the parent car brand               |
+| `listings` | Relation (Listing)  | Listings that belong to this car model          |
+
+
 
 ---
 
@@ -179,32 +219,39 @@ Instead of permanently deleting records, we mark them as inactive.
 ## 3. API Endpoints and CRUD
 
 ### Users
-| Method | Endpoint | Description | Auth Required |
-|--------|---------|-------------|--------------|
-| `POST` | `/auth/register` | Register a new user | ❌ |
-| `POST` | `/auth/login` | Log in and get access token | ❌ |
-| `GET` | `/users/{id}` | Get user details | ✅ (Self/Admin) |
-| `PUT` | `/users/{id}` | Update user profile (name, phone, password) | ✅ (Self) |
-| `PATCH` | `/users/{id}` | Soft delete user account | ✅ (Self/Admin) |
+| Method  | Endpoint    | Description                           | Auth Required |
+|---------|------------|--------------------------------------|--------------|
+| `POST`  | `/auth/register` | Register a new user              | ❌ |
+| `POST`  | `/auth/login` | Log in and get access token        | ❌ |
+| `GET`   | `/users` | Retrieve all users                   | ❌ |
+| `GET`   | `/users/me` | Get the authenticated user's profile | ✅ (Self) |
+| `GET`   | `/users/{id}` | Get user details                   | ❌ |
+| `PATCH` | `/users/{id}` | Soft delete user account           | ❌ |
 
 ---
 
 ### Listings (Vehicles)
-| Method | Endpoint | Description | Auth Required |
-|--------|---------|-------------|--------------|
-| `POST` | `/listings` | Create a new vehicle listing | ✅ (Seller) |
-| `GET` | `/listings` | Get all vehicle listings (supports search filters) | ❌ |
-| `GET` | `/listings/{id}` | Get vehicle details | ❌ |
-| `PUT` | `/listings/{id}` | Update vehicle listing | ✅ (Owner) |
-| `PATCH` | `/listings/{id}` | Soft delete listing | ✅ (Owner/Admin) |
+| Method  | Endpoint                      | Description                                           | Auth Required |
+|---------|--------------------------------|-------------------------------------------------------|--------------|
+| `POST`  | `/listing`                     | Create a new vehicle listing                         | ✅ (Seller) |
+| `GET`   | `/listing/user/{sellerId}`     | Get all listings created by a specific user          | ❌ |
+| `GET`   | `/listing`                     | Get all vehicle listings (supports search filters)   | ❌ |
+| `GET`   | `/listing/{id}`                | Get vehicle details                                  | ❌ |
+| `GET`   | `/listing/brands`              | Get all available vehicle brands                     | ❌ |
+| `GET`   | `/listing/brands/{brandId}/models` | Get all models for a specific brand              | ❌ |
+| `PUT`   | `/listing/{id}`                | Update vehicle listing                               | ✅ (Owner) |
+| `PATCH` | `/listing/{id}`                | Soft delete listing                                 | ✅ (Owner/Admin) |
+
 
 #### **Search Filters for Listings**
 - **Basic Filters Supported:**
-  - `price_min` and `price_max`
-  - `mileage_min` and `mileage_max`
-  - `year_min` and `year_max`
-  - `fuel_type`
+  - `brand`
+  - `minPrice` and `maxPrice`
+  - `fuelType`
   - `transmission`
+  - `sort`
+  - `page`
+  - `limit`
   
 Example:  
 `GET /listings?price_min=5000&price_max=20000&mileage_max=50000&fuel_type=petrol`
@@ -212,12 +259,13 @@ Example:
 ---
 
 ### Favorites
-| Method | Endpoint | Description | Auth Required |
-|--------|---------|-------------|--------------|
-| `POST` | `/favorites` | Save a vehicle to favorites | ✅ (User) |
-| `GET` | `/favorites` | Get all favorite listings | ✅ (User) |
-| `DELETE` | `/favorites/{id}` | Remove a saved listing | ✅ (User) |
-| `GET` | `/favorites/count/{listing_id}` | Get the number of users who favorited a listing | ❌ |
+| Method  | Endpoint                         | Description                                   | Auth Required |
+|---------|----------------------------------|-----------------------------------------------|--------------|
+| `POST`  | `/favorites`                     | Save a vehicle to favorites                  | ✅ (User) |
+| `GET`   | `/favorites`                     | Get all favorite listings of the authenticated user | ✅ (User) |
+| `DELETE`| `/favorites`                     | Remove a saved listing from favorites        | ✅ (User) |
+| `GET`   | `/favorites/count/{listingId}`   | Get the number of users who favorited a listing | ❌ |
+
 
 ---
 
@@ -235,7 +283,7 @@ Example:
 |--------|---------|-------------|--------------|
 | `POST` | `/reports` | Report a listing for fraud or violations | ✅ (User) |
 | `GET` | `/reports` | View all reports (admin only) | ✅ (Admin) |
-| `PUT` | `/reports/{reportId}` | Update report status (`OPEN`, `UNDER_REVIEW`, `RESOLVED`) | ✅ (Admin) |
+| `PATCH` | `/reports/{reportId}` | Update report status (`OPEN`, `UNDER_REVIEW`, `RESOLVED`) | ✅ (Admin) |
 
 ---
 

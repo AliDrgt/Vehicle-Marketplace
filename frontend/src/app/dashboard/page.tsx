@@ -116,19 +116,25 @@ export default function UserDashboard() {
 
 // Main Dashboard Layout
 return (
-  <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl font-display">
-          My Dashboard
-        </h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Manage your listings and saved vehicles
-        </p>
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Dashboard Header with Gradient Accent */}
+      <header className="relative mb-10 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-10 rounded-3xl"></div>
+        <div className="relative z-10 px-8 py-10">
+          <h1 className="text-4xl font-bold text-gray-900 font-display tracking-tight">
+            My Dashboard
+          </h1>
+          <p className="mt-2 text-lg text-gray-600 max-w-xl">
+            Manage your vehicle listings and saved favorites in one place
+          </p>
+        </div>
+        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-blue-500 to-indigo-600 opacity-20 rounded-full blur-2xl"></div>
       </header>
       
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 border border-gray-100">
-        {/* Tab Navigation */}
+      {/* Main Content Container */}
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 border border-gray-100">
+        {/* Tab Navigation - Refined */}
         <div className="flex border-b border-gray-200">
           {["listings", "favorites"].map((tab) => (
             <button
@@ -136,35 +142,35 @@ return (
               role="tab"
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
-              className={`relative flex-1 text-center py-5 px-4 text-sm font-medium transition-all duration-200 
+              className={`relative flex-1 text-center py-6 px-4 text-base font-medium transition-all duration-300 overflow-hidden
                 ${activeTab === tab 
-                  ? "text-blue-600 bg-blue-50/30" 
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  ? "text-blue-700 bg-gradient-to-b from-blue-50 to-transparent" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
             >
-              <div className="flex items-center justify-center space-x-2">
-                <span className={`h-5 w-5 ${activeTab === tab ? "text-blue-500" : "text-gray-400"}`}>
+              <div className="flex items-center justify-center space-x-3">
+                <span className={`h-6 w-6 transition-all duration-300 ${activeTab === tab ? "text-blue-600" : "text-gray-400"}`}>
                   {tab === "listings" ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="transition-all duration-200">
-                      <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.5 3.75a1.5 1.5 0 0 0-1.5 1.5v1.5h13.5V5.25a1.5 1.5 0 0 0-1.5-1.5h-10ZM6 6.75v10.5a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V6.75H6ZM1.5 5.25a3 3 0 0 1 3-3h15a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3v-12Z" />
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="transition-all duration-200">
-                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
                     </svg>
                   )}
                 </span>
-                <span className="font-medium">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+                <span className="font-medium text-lg tracking-wide">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
               </div>
               {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 animate-fadeIn"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 transform animate-fadeIn"></div>
               )}
             </button>
           ))}
         </div>
         
         {/* Content Area */}
-        <div className="p-6 lg:p-8 min-h-[60vh]">
+        <div className="p-8 lg:p-10">
           {activeTab === "listings" && <ListingsSection listings={listings} />}
           {activeTab === "favorites" && <FavoritesSection favorites={favorites} />}
         </div>
@@ -237,38 +243,46 @@ function ListingsSection({ listings }: { listings: Listing[] }) {
 
 return (
   <section className="mt-2" aria-label="My Listings">
-    <div className="flex justify-between items-center mb-6">
-      <h2 className="text-2xl font-semibold text-gray-800">My Listings</h2>
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+      <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+        <span className="bg-blue-100 text-blue-700 p-2 rounded-lg mr-3">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <path d="M7.5 3.75a1.5 1.5 0 0 0-1.5 1.5v1.5h13.5V5.25a1.5 1.5 0 0 0-1.5-1.5h-10ZM6 6.75v10.5a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V6.75H6ZM1.5 5.25a3 3 0 0 1 3-3h15a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3v-12Z" />
+          </svg>
+        </span>
+        My Listings
+        <span className="ml-3 text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">{listings.length}</span>
+      </h2>
       <Link href="/listing/create-listing">
-        <span className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all duration-150 hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg xmlns="http://www.w3.org/2000/svg" className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <span className="group inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg focus:ring-4 focus:ring-blue-300 transform hover:-translate-y-0.5">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          Add Listing
+          Add New Listing
         </span>
       </Link>
     </div>
     {listings.length ? (
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} onDelete={handleDelete} />
         ))}
       </ul>
     ) : (
-      <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-2xl border border-gray-100">
-        <div className="rounded-full bg-gray-100 p-4 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+        <div className="rounded-full bg-blue-100 p-5 mb-6 animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-800 mb-2">No active listings</h3>
-        <p className="text-gray-500 mb-6 text-center max-w-sm">Create your first listing to start selling your vehicle</p>
+        <h3 className="text-2xl font-bold text-gray-800 mb-3">No Active Listings</h3>
+        <p className="text-gray-600 mb-8 text-center max-w-md text-lg">Create your first listing to start selling your vehicle</p>
         <Link href="/listing/create-listing">
-          <span className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all duration-150 hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <span className="group inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg focus:ring-4 focus:ring-blue-300 transform hover:-translate-y-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            Create a Listing
+            Create Your First Listing
           </span>
         </Link>
       </div>
@@ -281,49 +295,58 @@ return (
 
 function ListingCard({ listing, onDelete }: { listing: Listing; onDelete: (id: string) => void }) {
   return (
-    <li className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col relative overflow-hidden">
-      <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <div className="bg-gray-800 bg-opacity-70 rounded-full p-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+    <li className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative overflow-hidden transform hover:-translate-y-1">
+      {/* Mock image placeholder - would use actual image in production */}
+      <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 relative">
+        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
           </svg>
+        </div>
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+          <div className="flex space-x-2">
+            <Link href={`/listing/create-listing/?id=${listing.id}`} className="bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-50">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </Link>
+            <button 
+              className="bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-50"
+              onClick={() => onDelete(listing.id)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
       
       <div className="flex-1 p-6">
         <Link href={`/listing/${listing.id}`}>
-          <span className="block text-blue-600 font-semibold text-xl hover:text-blue-700 transition-colors line-clamp-2 mb-1">
+          <span className="block text-blue-700 font-bold text-xl hover:text-blue-800 transition-colors line-clamp-2 mb-2">
             {listing.title}
           </span>
         </Link>
-        <div className="flex items-center mt-2 mb-4">
-          <span className="inline-flex items-center justify-center bg-green-100 rounded-full px-3 py-0.5">
-            <span className="text-green-800 text-sm font-medium">
+        <div className="flex items-center mt-4">
+          <span className="inline-flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg px-4 py-1.5">
+            <span className="text-white font-bold text-lg">
               ${listing.price.toLocaleString()}
             </span>
           </span>
         </div>
       </div>
       
-      <div className="border-t border-gray-100 bg-gray-50 flex justify-between p-4">
-        <Link href={`/listing/create-listing/?id=${listing.id}`}>
-          <span className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-800 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Edit
-          </span>
-        </Link>
-        <button 
-          className="inline-flex items-center text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
-          onClick={() => onDelete(listing.id)}
-        >
+      <div className="border-t border-gray-100 bg-gray-50 p-4 flex justify-between items-center">
+        <Link href={`/listing/${listing.id}`} className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
-          Delete
-        </button>
+          View Details
+        </Link>
+        <div className="text-xs text-gray-500">Added March 5, 2025</div>
       </div>
     </li>
   );
@@ -339,38 +362,58 @@ interface Favorite {
 function FavoritesSection({ favorites }: { favorites: Favorite[] }) {
   return (
     <section className="mt-2" aria-label="Favorite Listings">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Favorite Listings</h2>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          <span className="bg-pink-100 text-pink-700 p-2 rounded-lg mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+            </svg>
+          </span>
+          Saved Vehicles
+          <span className="ml-3 text-sm bg-pink-100 text-pink-800 py-1 px-3 rounded-full">{favorites.length}</span>
+        </h2>
         <Link href="/listings">
-          <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <span className="group inline-flex items-center text-base font-medium text-blue-700 hover:text-blue-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             Browse More Vehicles
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </span>
         </Link>
       </div>
       {favorites.length ? (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {favorites.map((fav) => (
-            <li key={fav.id} className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-              <div className="absolute right-4 top-4">
-                <div className="bg-pink-100 rounded-full p-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+            <li key={fav.id} className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative overflow-hidden transform hover:-translate-y-1">
+              {/* Mock image placeholder - would use actual image in production */}
+              <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                   </svg>
+                </div>
+                <div className="absolute top-3 right-3">
+                  <span className="inline-flex items-center justify-center p-2 bg-pink-100 rounded-full shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    </svg>
+                  </span>
                 </div>
               </div>
               
-              <div className="p-6">
+              <div className="flex-1 p-6">
                 <Link href={`/listing/${fav.id}`}>
-                  <span className="block text-blue-600 font-semibold text-xl hover:text-blue-700 transition-colors mb-1 line-clamp-2">
-                    {fav.title || "Untitled"}
+                  <span className="block text-blue-700 font-bold text-xl hover:text-blue-800 transition-colors mb-2 line-clamp-2">
+                    {fav.title || "Untitled Vehicle"}
                   </span>
                 </Link>
-                <div className="flex items-center mt-3">
-                  <span className="inline-flex items-center justify-center bg-blue-100 rounded-full px-3 py-0.5">
-                    <span className="text-blue-800 text-sm font-medium">
+                <div className="flex items-center mt-4">
+                  <span className="inline-flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg px-4 py-1.5">
+                    <span className="text-white font-bold text-lg">
                       ${fav.price?.toLocaleString() || "N/A"}
                     </span>
                   </span>
@@ -379,9 +422,9 @@ function FavoritesSection({ favorites }: { favorites: Favorite[] }) {
               
               <div className="border-t border-gray-100 bg-gray-50 p-4 flex justify-end">
                 <Link href={`/listing/${fav.id}`}>
-                  <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                  <span className="inline-flex items-center justify-center px-5 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm transition-all duration-200 hover:shadow focus:outline-none group">
                     View Details
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </span>
@@ -391,20 +434,20 @@ function FavoritesSection({ favorites }: { favorites: Favorite[] }) {
           ))}
         </ul>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-2xl border border-gray-100">
-          <div className="rounded-full bg-gray-100 p-4 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+          <div className="rounded-full bg-pink-100 p-5 mb-6 animate-pulse">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-800 mb-2">No favorite listings yet</h3>
-          <p className="text-gray-500 mb-6 text-center max-w-sm">Save listings you&aposre interested in to compare them later</p>
-          <Link href="/listing/search">
-            <span className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all duration-150 hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              <svg xmlns="http://www.w3.org/2000/svg" className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <h3 className="text-2xl font-bold text-gray-800 mb-3">No Favorite Vehicles Yet</h3>
+          <p className="text-gray-600 mb-8 text-center max-w-md text-lg">Save vehicles you're interested in to compare them later</p>
+          <Link href="/listings">
+            <span className="group inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg focus:ring-4 focus:ring-blue-300 transform hover:-translate-y-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              Browse Vehicles
+              Browse Vehicles Now
             </span>
           </Link>
         </div>
