@@ -2,15 +2,15 @@ import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Request, Qu
 import { VehicleService } from './vehicle.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthRequest } from '../auth/auth-request.interface';
-import { IsString, IsNumber, IsBoolean, IsOptional, IsObject } from 'class-validator'; 
+import { IsString, IsNumber, IsBoolean, IsOptional, IsObject, IsArray } from 'class-validator'; 
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 
 
-export class CreateVehicleDto {
-  //Required fields
-  @IsString() brand!: string;
-  @IsString() model!: string;
+export class CreateListingDto {
+  // Required fields
+  @IsNumber() brandId!: number;
+  @IsNumber() modelId!: number;
   @IsString() title!: string;
   @IsNumber() price!: number;
   @IsNumber() mileage!: number;
@@ -22,9 +22,14 @@ export class CreateVehicleDto {
   @IsString() description!: string;
   @IsObject() location!: { latitude: number; longitude: number };
 
-  //Optional fields
+  // Optional fields
   @IsNumber() @IsOptional() enginePower?: number;
   @IsBoolean() @IsOptional() isSecondHand?: boolean;
+
+  @IsArray()
+  @IsString({ each: true }) // Ensure each element is a string
+  @IsOptional()
+  photos?: string[];
 }
 
 class LocationDto {
@@ -32,69 +37,87 @@ class LocationDto {
   @IsNumber() longitude!: number;
 }
 
-export class UpdateVehicleDto extends PartialType(CreateVehicleDto) {}
+export class UpdateVehicleDto extends PartialType(CreateListingDto) {}
 @UseGuards(JwtAuthGuard)
-@Controller('vehicles')
-export class VehicleController {
+@Controller('listing')
+export class ListingController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   // Create Vehicle
   @Post()
-  async createVehicle(@Request() req: AuthRequest, @Body() body: CreateVehicleDto) {
+  async createListing(@Request() req: AuthRequest, @Body() body: CreateListingDto) {
     const userId = req.user.id;
     if (!userId) {
       throw new Error('User ID is missing from request');
     }
-    return this.vehicleService.createVehicle(userId, body);
+    return this.vehicleService.createListing(userId, body);
   }
 
-  // Get All Vehicles
-  @Get()
-  async getAllVehicles(
-    @Query('brand') brand?: string,
-    @Query('minPrice') minPrice?: string,
-    @Query('maxPrice') maxPrice?: string,
-    @Query('fuelType') fuelType?: string,
-    @Query('transmission') transmission?: string,
-    @Query('sort') sort?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string
-  ) {
-    return this.vehicleService.getAllVehicles({
-      brand,
-      minPrice,
-      maxPrice,
-      fuelType,
-      transmission,
-      sort,
-      page,
-      limit,
-    });
+  @Get("/user/:sellerId")
+  async getUserListings(@Param('sellerId') sellerId: string) {
+    console.log("Fetching listings for seller:", sellerId);
+    return this.vehicleService.getUserListings(sellerId);
   }
 
-  // Get a Specific Vehicle
-  @Get(':id')
-  async getVehicleById(@Param('id') vehicleId: string) {
-    const cleanedId = vehicleId.trim(); // Trim ID in the controller
-    return this.vehicleService.getVehicleById(cleanedId);
+
+  // Get All Listings
+@Get()
+async getAllListings(
+  @Query('brand') brand?: string,
+  @Query('minPrice') minPrice?: string,
+  @Query('maxPrice') maxPrice?: string,
+  @Query('fuelType') fuelType?: string,
+  @Query('transmission') transmission?: string,
+  @Query('sort') sort?: string,
+  @Query('page') page?: string,
+  @Query('limit') limit?: string
+) {
+  return this.vehicleService.getAllListings({
+    brand,
+    minPrice,
+    maxPrice,
+    fuelType,
+    transmission,
+    sort,
+    page,
+    limit,
+  });
 }
 
+  @Get('/brands')
+  async getAllBrands() {
+    console.log("Controller: GET /listing/brands called");
+    return this.vehicleService.getAllBrands();
+  }
+
+  // Get a Specific Listing
+  @Get(':id')
+  async getListingById(@Param('id') listingId: string) {
+    const cleanedId = listingId.trim(); // Trim ID in the controller
+    return this.vehicleService.getListingById(cleanedId);
+  }
 
   // Update Vehicle
   @Put(':id')
-  async updateVehicle(@Request() req: AuthRequest, @Param('id') vehicleId: string, @Body() body: UpdateVehicleDto) {
+  async updateListing(@Request() req: AuthRequest, @Param('id') listingId: string, @Body() body: UpdateVehicleDto) {
     const userId = req.user.id;
-    return this.vehicleService.updateVehicle(userId, vehicleId, body);
+    return this.vehicleService.updateListing(userId, listingId, body);
   }
 
   // Delete (Soft Delete) Vehicle
   @Patch(':id')
-  async deleteVehicle(@Request() req: AuthRequest, @Param('id') vehicleId: string) {
+  async deleteListing(@Request() req: AuthRequest, @Param('id') listingId: string) {
+    console.log(`Received DELETE request for listing: ${listingId}`);
+    console.log(`Full request object:`, req); //Debug
+    console.log(`Request User:`, req.user); //Debug
     const userId = req.user.id;
-    return this.vehicleService.deleteVehicle(userId, vehicleId);
+    return this.vehicleService.deleteListing(userId, listingId);
   }
-}
-function ValidateNested(): (target: CreateVehicleDto, propertyKey: "location") => void {
-  throw new Error('Function not implemented.');
+
+
+  @Get('/brands/:brandId/models')
+  async getModelsByBrand(@Param('brandId') brandId: number) {
+    return this.vehicleService.getModelsByBrand(brandId);
+  }
 }
 

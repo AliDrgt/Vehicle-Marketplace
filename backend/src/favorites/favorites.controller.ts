@@ -3,30 +3,33 @@ import { FavoritesService } from './favorites.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthRequest } from '../auth/auth-request.interface';
 
-@UseGuards(JwtAuthGuard)
+
 @Controller('favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async addFavorite(@Request() req: AuthRequest, @Body('vehicle_id') vehicleId: string) {
+  async addFavorite(@Request() req: AuthRequest, @Body('listing_id') listingId: string) {
     const userId = req.user.id;
-    return this.favoritesService.addFavorite(userId, vehicleId);
+    return this.favoritesService.addFavorite(userId, listingId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUserFavorites(@Request() req: AuthRequest) {
     return this.favoritesService.getUserFavorites(req.user.id);
   }
 
-  @Delete(':id')
-  async removeFavorite(@Request() req: AuthRequest, @Param('id') favoriteId: string) {
-    return this.favoritesService.removeFavorite(req.user.id, favoriteId);
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async removeFavorite(@Request() req: AuthRequest, @Body('listing_id') listingId: string) {
+    return this.favoritesService.removeFavorite(req.user.id, listingId);
   }
 
-  @Get('count/:vehicle_id')
-  async countFavorites(@Param('vehicle_id') vehicleId: string) {
-    return { vehicleId, count: await this.favoritesService.countFavoritesForVehicle(vehicleId) };
+  @Get('count/:listingId')
+  async countFavorites(@Param('listingId') listingId: string) {
+    return { listingId, count: await this.favoritesService.countFavoritesForVehicle(listingId) };
   }
 }
 

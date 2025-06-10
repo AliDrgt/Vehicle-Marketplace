@@ -7,14 +7,14 @@ export class VehiclePhotoController {
 
   // Upload a photo
   @Post()
-  async uploadPhoto(@Param('id') vehicleId: string, @Body('photoUrl') photoUrl: string) {
-    return this.vehiclePhotoService.addPhoto(vehicleId, photoUrl);
+  async uploadPhoto(@Param('id') listingId: string, @Body('photoUrl') photoUrl: string) {
+    return this.vehiclePhotoService.addPhoto(listingId, photoUrl);
   }
 
   // Get all photos for a listing
   @Get()
-  async getPhotos(@Param('id') vehicleId: string) {
-    return this.vehiclePhotoService.getPhotosByVehicle(vehicleId);
+  async getPhotos(@Param('id') listingId: string) {
+    return this.vehiclePhotoService.getPhotosByVehicle(listingId);
   }
 
   // Delete a photo

@@ -1,136 +1,205 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateVehicleDto } from './vehicle.controller';
-import { PrismaService } from '../../prisma/prisma.service';
-import { UpdateVehicleDto } from './vehicle.controller';
-import { ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { CreateListingDto, UpdateVehicleDto } from './vehicle.controller';
+import { PrismaService} from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class VehicleService {
-  constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
-  // Create a new vehicle
-  async createVehicle(userId: string, data: CreateVehicleDto) {
-    return this.prisma.vehicle.create({
-      data: {
-        sellerId: userId,
-        brand: data.brand,
-        model: data.model,
-        title: data.title,
-        price: data.price,
-        mileage: data.mileage,
-        year: data.year,
-        fuelType: data.fuelType || 'Unknown',
-        transmission: data.transmission,
-        enginePower: data.enginePower ?? 0,
-        drivetrain: data.drivetrain,
-        color: data.color,
-        description: data.description,
-        location: data.location as any, 
-        isSecondHand: data.isSecondHand ?? false, 
-      },
-    });
-  }
-  
+    // Create a new listing
+    async createListing(userId: string, data: CreateListingDto) {
+        const brand = await this.prisma.carBrand.findUnique({ where: { id: data.brandId } });
+        const model = await this.prisma.carModel.findUnique({ where: { id: data.modelId, brandId: data.brandId } });
 
-  // Get all vehicles
-  async getAllVehicles(query: any) {
-    const {
-      brand,
-      minPrice,
-      maxPrice,
-      fuelType,
-      transmission,
-      sort,
-      page = 1,
-      limit = 10,
-    } = query;
+        if (!brand || !model) {
+            throw new BadRequestException("Invalid brand or model selection.");
+        }
 
-    const filters: any = {isDeleted: false};
-
-    if (brand) filters.brand = brand;
-    if (minPrice || maxPrice) {
-      filters.price = {};
-      if (minPrice) filters.price.gte = Number(minPrice);
-      if (maxPrice) filters.price.lte = Number(maxPrice);
-    }
-    if (fuelType) filters.fuelType = fuelType;
-    if (transmission) filters.transmission = transmission;
-
-    const orderBy = [];
-    if (sort) {
-      const [field, direction] = sort.split('_');
-      if (['price', 'year', 'mileage'].includes(field) && ['asc', 'desc'].includes(direction)) {
-        orderBy.push({ [field]: direction });
-      }
+        return this.prisma.listing.create({
+            data: {
+                sellerId: userId,
+                brandId: data.brandId,
+                modelId: data.modelId,
+                title: data.title,
+                price: data.price,
+                mileage: data.mileage,
+                year: data.year,
+                fuelType: data.fuelType,
+                transmission: data.transmission,
+                enginePower: data.enginePower ?? 0,
+                drivetrain: data.drivetrain,
+                color: data.color,
+                description: data.description,
+                location: data.location,
+                isSecondHand: data.isSecondHand ?? false,
+                photos: {
+                    create: (data.photos || []).map(photoUrl => ({ photoUrl }))
+                }
+            },
+        });
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
-    const take = Number(limit);
-
-    return this.prisma.vehicle.findMany({
-      where: filters,
-      orderBy,
-      skip,
-      take,
-    });
-  }
-
-  // Get a single vehicle by ID
-  async getVehicleById(vehicleId: string) {
-    const cleanedId = vehicleId.trim(); // Trim the ID again (just in case)
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: cleanedId },
-    });
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
-    }
-    return vehicle;
-  }
-  
-  
-  
-
-  // Update a vehicle listing
-  async updateVehicle(userId: string, vehicleId: string, data: UpdateVehicleDto) {
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
-    });
-
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    async getAllBrands() {
+        return this.prisma.carBrand.findMany();
     }
 
-    if (vehicle.isDeleted) {
-      throw new NotFoundException('Vehicle is deleted and cannot be updated');
+    async getModelsByBrand(brandId: number) {
+        return this.prisma.carModel.findMany({ where: { brandId: Number(brandId) } });
     }
 
-    if (vehicle.sellerId !== userId) {
-      throw new ForbiddenException('You are not allowed to modify this vehicle');
+    // Get all listings
+    async getAllListings(query: any) {
+        const { brand, minPrice, maxPrice, fuelType, transmission, sort, page = 1, limit = 10 } = query;
+    
+        const filters: any = { isDeleted: false };
+    
+        if (brand) filters.brandId = Number(brand);
+        if (minPrice || maxPrice) {
+            filters.price = {};
+            if (minPrice) filters.price.gte = Number(minPrice);
+            if (maxPrice) filters.price.lte = Number(maxPrice);
+        }
+        if (fuelType) filters.fuelType = fuelType;
+        if (transmission) filters.transmission = transmission;
+    
+        const orderBy: Prisma.ListingOrderByWithRelationInput[] = [];
+        if (sort === 'newest') {
+            orderBy.push({ createdAt: 'desc' });
+        } else if (sort) {
+            const [field, direction] = sort.split('_');
+            if (['price', 'year', 'mileage'].includes(field) && ['asc', 'desc'].includes(direction)) {
+                orderBy.push({ [field]: direction as Prisma.SortOrder });
+            }
+        }
+    
+        const skip = (Number(page) - 1) * Number(limit);
+        const take = Number(limit);
+    
+        //  Get total count of listings (without pagination)
+        const totalCount = await this.prisma.listing.count({
+            where: filters,
+        });
+    
+        //  Fetch listings with pagination
+        const listings = await this.prisma.listing.findMany({
+            where: filters,
+            orderBy,
+            skip,
+            take,
+            include: {
+                brand: { select: { id: true, name: true } },
+                model: { select: { id: true, name: true } },
+                photos: { select: { photoUrl: true } },
+            },
+        });
+    
+        // 🔹 Calculate total pages
+        const totalPages = Math.ceil(totalCount / take);
+    
+        return {
+            listings,
+            totalPages,
+            totalCount, 
+            currentPage: Number(page),
+            perPage: take,
+        };
+    }
+    
+
+    // Get a single listing by ID
+    async getListingById(id: string) {
+        return this.prisma.listing.findUnique({
+            where: { id },
+            include: {
+                brand: { select: { id: true, name: true } },
+                model: { select: { id: true, name: true } },
+                photos: { select: { photoUrl: true } },
+            },
+        });
     }
 
-    return this.prisma.vehicle.update({
-      where: { id: vehicleId },
-      data,
-    });
-  }
-
-  // Delete (soft delete) a vehicle
-  async deleteVehicle(userId: string, vehicleId: string) {
-    const vehicle = await this.prisma.vehicle.findUnique({
-      where: { id: vehicleId },
-    });
-
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    async getUserListings(sellerId: string) {
+        console.log("Fetching listings for user ID:", sellerId);
+    
+        return this.prisma.listing.findMany({
+            where: { sellerId, isDeleted: false },
+            orderBy: { createdAt: "desc" },
+            include: {
+                brand: { select: { id: true, name: true } },
+                model: { select: { id: true, name: true } },
+            },
+        });
     }
 
-    if (vehicle.sellerId !== userId) {
-      throw new NotFoundException('Unauthorized: You cannot delete this vehicle');
+    // Update a listing
+    async updateListing(userId: string, listingId: string, data: UpdateVehicleDto) {
+        const listing = await this.prisma.listing.findUnique({
+            where: { id: listingId },
+            include: { photos: true } // Fetch existing photos
+        });
+    
+        if (!listing) throw new NotFoundException('Listing not found');
+        if (listing.isDeleted) throw new NotFoundException('Listing is deleted and cannot be updated');
+        if (listing.sellerId !== userId) throw new ForbiddenException('Unauthorized');
+    
+        // Get existing photo URLs
+        const existingPhotoUrls = listing.photos.map(photo => photo.photoUrl);
+    
+        return this.prisma.listing.update({
+            where: { id: listingId },
+            data: {
+                brandId: data.brandId,
+                modelId: data.modelId,
+                title: data.title,
+                price: data.price,
+                mileage: data.mileage,
+                year: data.year,
+                fuelType: data.fuelType,
+                transmission: data.transmission,
+                drivetrain: data.drivetrain,
+                color: data.color,
+                description: data.description,
+                location: data.location,
+                enginePower: data.enginePower,
+                isSecondHand: data.isSecondHand,
+    
+                photos: {
+                    deleteMany: {
+                        photoUrl: { notIn: data.photos || [] } // Remove photos not included in the update
+                    },
+                    create: (data.photos || [])
+                        .filter(photoUrl => !existingPhotoUrls.includes(photoUrl)) // Only add new photos
+                        .map(photoUrl => ({ photoUrl }))
+                }
+            }
+        });
     }
+    
 
-    return this.prisma.vehicle.update({
-      where: { id: vehicleId },
-      data: { isDeleted: true as boolean },
-    });
-  }
+    // Delete (soft delete) a listing
+    async deleteListing(userId: string, listingId: string) {
+        console.log(`Attempting to delete listing: ${listingId} by user: ${userId}`); // Debug
+        const listing = await this.prisma.listing.findUnique({ where: { id: listingId } }); 
+    
+        if (!listing) {
+            console.log(`❌ Listing not found: ${listingId}`);
+            throw new NotFoundException("Listing not found");
+        }
+    
+        console.log(`isting found: ${listingId}, Seller: ${listing.sellerId}, isDeleted: ${listing.isDeleted}`); // Debug
+    
+    
+        //only the owner or an admin can delete
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    
+        if (listing.sellerId !== userId && user?.role?.toLowerCase() !== "admin") {
+            throw new ForbiddenException("You are not authorized to delete this listing.");
+        }
+    
+        return this.prisma.listing.update({
+            where: { id: listingId },
+            data: { isDeleted: true },
+        });
+    }
 }

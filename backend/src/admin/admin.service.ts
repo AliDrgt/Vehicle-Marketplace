@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ReportStatus } from '@prisma/client';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class AdminService {
   // Get all reports
   async getAllReports() {
     return this.prisma.report.findMany({
-      include: { vehicle: true, reporter: { select: { email: true } } },
+      include: { listing: true, reporter: { select: { email: true } } },
     });
   }
 
